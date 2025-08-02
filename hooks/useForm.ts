@@ -1,10 +1,10 @@
 import { useForm as useHookForm, UseFormReturn, UseFormProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ZodSchema } from 'zod';
+import { ZodSchema, ZodType, ZodTypeDef } from 'zod';
 import { useCallback, useEffect } from 'react';
 
 interface UseFormOptions<T> extends Omit<UseFormProps<T>, 'resolver'> {
-  schema: ZodSchema<T>;
+  schema: ZodType<T, ZodTypeDef, T>;
   onSubmit?: (data: T) => void | Promise<void>;
   onError?: (errors: any) => void;
   transformOnSubmit?: (data: T) => T;
@@ -12,7 +12,7 @@ interface UseFormOptions<T> extends Omit<UseFormProps<T>, 'resolver'> {
 }
 
 interface UseFormResult<T> extends UseFormReturn<T> {
-  submitHandler: (data: T) => Promise<void>;
+  submitHandler: (e?: React.BaseSyntheticEvent) => Promise<void>;
   isSubmitting: boolean;
   hasErrors: boolean;
   isDirty: boolean;
@@ -28,7 +28,7 @@ export const useForm = <T extends Record<string, any>>({
   ...options
 }: UseFormOptions<T>): UseFormResult<T> => {
   const form = useHookForm<T>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema as any),
     mode: 'onChange',
     ...options,
   });

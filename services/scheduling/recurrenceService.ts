@@ -24,7 +24,7 @@ export const generateRecurrences = (initialAppointment: Appointment): Appointmen
     // Set to midnight to avoid time-related issues in date looping
     initialDate.setHours(0, 0, 0, 0);
 
-    let currentDate = new Date(initialDate);
+    const currentDate = new Date(initialDate);
 
     while (currentDate <= untilDate) {
         if (recurrenceRule.days.includes(currentDate.getDay())) {

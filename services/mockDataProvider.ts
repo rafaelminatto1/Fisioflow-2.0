@@ -165,10 +165,10 @@ class MockDataProvider {
         appointments = appointments.filter(a => a.therapistId === filters.therapistId);
       }
       if (filters.startDate) {
-        appointments = appointments.filter(a => a.startTime >= filters.startDate!);
+        appointments = appointments.filter(a => a.startTime >= filters.startDate);
       }
       if (filters.endDate) {
-        appointments = appointments.filter(a => a.startTime <= filters.endDate!);
+        appointments = appointments.filter(a => a.startTime <= filters.endDate);
       }
     }
 
@@ -245,7 +245,9 @@ class MockDataProvider {
     this.data = { ...this.data, ...seedData };
     
     Object.entries(seedData).forEach(([key, value]) => {
-      this.saveToStorage(key, value);
+      if (Array.isArray(value)) {
+        this.saveToStorage(key, value as any[]);
+      }
     });
   }
 }

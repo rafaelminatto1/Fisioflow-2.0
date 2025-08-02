@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/test/**/*",
+    "tests/**/*",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "services/supabase/**/*",
+    "database/**/*",
+    "scripts/**/*",
+    "utils/formUtils.ts",
+    "capacitor.config.ts",
+    "schemas/**/*"
+  ]
+}

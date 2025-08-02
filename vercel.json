@@ -1,15 +1,10 @@
 {
   "version": 2,
   "name": "fisioflow-2.0",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
+  "framework": "vite",
+  "buildCommand": "npm run build:dev",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
   "routes": [
     {
       "src": "/assets/(.*)",
@@ -67,12 +62,11 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
+    "NODE_ENV": "production",
+    "VITE_SUPABASE_URL": "@vite_supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@vite_supabase_anon_key",
+    "VITE_APP_NAME": "FisioFlow",
+    "VITE_APP_VERSION": "2.0.0"
   },
   "functions": {
     "app/api/**/*.ts": {

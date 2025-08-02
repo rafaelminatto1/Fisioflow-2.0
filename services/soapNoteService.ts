@@ -1,7 +1,7 @@
 import { SoapNote } from '../types';
 import { mockSoapNotes } from '../data/mockData';
 
-let notes: SoapNote[] = [...mockSoapNotes];
+const notes: SoapNote[] = [...mockSoapNotes];
 
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 

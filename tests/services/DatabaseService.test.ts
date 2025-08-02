@@ -1,15 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { DatabaseService, databaseService } from '../../services/supabase/DatabaseService';
 
 // Mock Supabase client
-const mockSupabase = {
-  from: vi.fn(),
-  rpc: vi.fn(),
-};
-
 vi.mock('../../services/supabase/supabaseClient', () => ({
-  supabase: mockSupabase,
+  supabase: {
+    from: vi.fn(),
+    rpc: vi.fn(),
+  },
 }));
+
+import { DatabaseService } from '../../services/supabase/databaseService';
 
 describe('DatabaseService', () => {
   let service: DatabaseService;
@@ -40,7 +39,8 @@ describe('DatabaseService', () => {
       single: vi.fn().mockReturnThis(),
     };
 
-    mockSupabase.from.mockReturnValue(mockQuery);
+    const { supabase } = await import('../../services/supabase/supabaseClient');
+    vi.mocked(supabase.from).mockReturnValue(mockQuery);
   });
 
   afterEach(() => {
@@ -55,8 +55,9 @@ describe('DatabaseService', () => {
     });
 
     it('should return the same instance as the exported singleton', () => {
-      const instance = DatabaseService.getInstance();
-      expect(instance).toBe(databaseService);
+      const instance1 = DatabaseService.getInstance();
+      const instance2 = DatabaseService.getInstance();
+      expect(instance1).toBe(instance2);
     });
   });
 

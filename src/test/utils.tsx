@@ -202,7 +202,7 @@ export const createMockSupabaseClient = () => {
 };
 
 // Mock database service responses
-export const createMockDatabaseResponse = <T>(data: T, error: string | null = null) => ({
+export const createMockDatabaseResponse = <T,>(data: T, error: string | null = null) => ({
   data,
   error,
   count: Array.isArray(data) ? data.length : data ? 1 : 0,

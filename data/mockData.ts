@@ -204,7 +204,7 @@ const recurrenceRule: RecurrenceRule = {
 };
 
 const recurringSeriesId = `series_${Date.now()}`;
-let recurrenceDate = getFutureDate(7, 15); // Start next week
+const recurrenceDate = getFutureDate(7, 15); // Start next week
 while(recurrenceDate.getTime() <= new Date(recurrenceRule.until).getTime()) {
     mockAppointments.push({
         id: `app_recurr_${recurrenceDate.getTime()}`,

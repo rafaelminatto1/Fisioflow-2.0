@@ -51,7 +51,7 @@ export const FormField = (props: FormFieldProps) => {
     props.className
   );
 
-  const renderInput = (field: any) => {
+  const renderInput = (field: any): React.JSX.Element => {
     switch (props.variant) {
       case 'textarea':
         const textareaProps = props as TextareaFormFieldProps;
@@ -95,7 +95,7 @@ export const FormField = (props: FormFieldProps) => {
 
       case 'custom':
         const customProps = props as CustomFormFieldProps;
-        return customProps.render(field, { error });
+        return customProps.render(field, { error }) as React.JSX.Element || <div />;
 
       default:
         const inputProps = props as InputFormFieldProps;

@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import * as treatmentService from '../../services/treatmentService';
 import * as appointmentService from '../../services/appointmentService';
-import { TreatmentPlan, Appointment } from '../../types';
+import { TreatmentPlan, Appointment, AppointmentStatus } from '../../types';
 import { 
   Target, 
   Calendar, 
@@ -62,7 +62,7 @@ const PatientStatCard = ({
 // Next appointments component
 const NextAppointments = ({ appointments }: { appointments: Appointment[] }) => {
   const upcomingAppointments = appointments
-    .filter(apt => new Date(apt.date) > new Date())
+    .filter(apt => new Date(apt.startTime) > new Date())
     .slice(0, 3);
 
   return (
@@ -76,14 +76,19 @@ const NextAppointments = ({ appointments }: { appointments: Appointment[] }) => 
           upcomingAppointments.map((appointment) => (
             <div key={appointment.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
               <div>
-                <p className="font-medium text-gray-900">{appointment.type}</p>
-                <p className="text-sm text-gray-600">Dr. {appointment.therapistName}</p>
+                <p className="font-medium text-gray-900">{appointment.title}</p>
+                <p className="text-sm text-gray-600">{appointment.type}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {new Date(appointment.date).toLocaleDateString('pt-BR')}
+                  {new Date(appointment.startTime).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm text-gray-600">{appointment.time}</p>
+                <p className="text-sm text-gray-600">
+                  {new Date(appointment.startTime).toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </p>
               </div>
             </div>
           ))
@@ -172,7 +177,7 @@ const PatientQuickActions = () => {
 
 const PatientDashboardPage: React.FC = () => {
     const { user } = useAuth();
-    const { addToast } = useToast();
+    const { success, error, showToast } = useToast();
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -183,19 +188,15 @@ const PatientDashboardPage: React.FC = () => {
           // In a real app, this would filter by patient ID
           const appointmentsData = await appointmentService.getAppointments();
           setAppointments(appointmentsData);
-        } catch (error) {
-          addToast({
-            type: 'error',
-            title: 'Erro ao carregar dados',
-            message: 'Não foi possível carregar suas informações.',
-          });
+        } catch (err: any) {
+          error('Não foi possível carregar suas informações.');
         } finally {
           setIsLoading(false);
         }
       };
 
       loadPatientData();
-    }, [addToast]);
+    }, [showToast]);
 
     if (isLoading) {
       return (
@@ -211,15 +212,15 @@ const PatientDashboardPage: React.FC = () => {
     }
 
     // Calculate patient stats
-    const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
+    const completedAppointments = appointments.filter(apt => apt.status === AppointmentStatus.Completed).length;
     const upcomingAppointments = appointments.filter(apt => 
-      new Date(apt.date) > new Date() && apt.status === 'scheduled'
+      new Date(apt.startTime) > new Date() && apt.status === AppointmentStatus.Scheduled
     ).length;
 
     return (
         <div className="space-y-6">
             <PageHeader
-                title={`Bem-vindo(a), ${user?.profile.firstName}!`}
+                title={`Bem-vindo(a), ${user?.name.split(' ')[0]}!`}
                 subtitle="Acompanhe seu progresso e mantenha-se em dia com seu tratamento."
             />
 

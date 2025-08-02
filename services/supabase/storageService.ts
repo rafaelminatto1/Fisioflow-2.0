@@ -1,5 +1,19 @@
 import { supabase } from './supabaseClient';
-import type { StorageError, FileObject } from '@supabase/supabase-js';
+
+// Generic storage types since they're not exported from main package
+interface StorageError {
+  message: string;
+  statusCode?: string;
+}
+
+interface FileObject {
+  name: string;
+  id?: string;
+  updated_at?: string;
+  created_at?: string;
+  last_accessed_at?: string;
+  metadata?: Record<string, any>;
+}
 
 export interface UploadOptions {
   cacheControl?: string;
@@ -29,7 +43,7 @@ export class StorageService {
         .upload(path, file, {
           cacheControl: options.cacheControl || '3600',
           upsert: options.upsert || false,
-          contentType: options.contentType
+          ...(options.contentType && { contentType: options.contentType })
         });
 
       if (error) {
@@ -160,9 +174,9 @@ export class StorageService {
       const { data, error } = await supabase.storage
         .from(bucket)
         .list(path, {
-          limit: options.limit,
-          offset: options.offset,
-          sortBy: options.sortBy
+          ...(options.limit !== undefined && { limit: options.limit }),
+          ...(options.offset !== undefined && { offset: options.offset }),
+          ...(options.sortBy && { sortBy: options.sortBy })
         });
 
       if (error) {
@@ -247,8 +261,8 @@ export class StorageService {
     try {
       const { data, error } = await supabase.storage.createBucket(bucketName, {
         public: options.public || false,
-        allowedMimeTypes: options.allowedMimeTypes,
-        fileSizeLimit: options.fileSizeLimit
+        ...(options.allowedMimeTypes && { allowedMimeTypes: options.allowedMimeTypes }),
+        ...(options.fileSizeLimit !== undefined && { fileSizeLimit: options.fileSizeLimit })
       });
 
       if (error) {

@@ -164,12 +164,16 @@ export const isValidCNPJ = (cnpj: string): boolean => {
 /**
  * Transform form data before submission
  */
-export const transformFormData = <T>(data: T, transformers: Partial<Record<keyof T, (value: any) => any>>): T => {
+export const transformFormData = <T extends Record<string, any>>(
+  data: T, 
+  transformers: Partial<Record<keyof T, (value: unknown) => unknown>>
+): T => {
   const transformed = { ...data };
   
   Object.entries(transformers).forEach(([key, transformer]) => {
     if (transformer && key in transformed) {
-      (transformed as any)[key] = transformer((transformed as any)[key]);
+      const typedKey = key as keyof T;
+      transformed[typedKey] = transformer(transformed[typedKey]) as T[keyof T];
     }
   });
   
@@ -183,7 +187,7 @@ export const resetFormWithDefaults = <T>(
   form: UseFormReturn<T>, 
   defaultValues?: Partial<T>
 ) => {
-  form.reset(defaultValues);
+  form.reset(defaultValues as any);
   form.clearErrors();
 };
 
@@ -199,7 +203,10 @@ export const hasUnsavedChanges = <T>(form: UseFormReturn<T>): boolean => {
  */
 export const getFieldError = <T>(form: UseFormReturn<T>, fieldName: keyof T): string | undefined => {
   const error = form.formState.errors[fieldName];
-  return error?.message as string | undefined;
+  if (error && typeof error === 'object' && 'message' in error) {
+    return error.message as string;
+  }
+  return undefined;
 };
 
 export default {

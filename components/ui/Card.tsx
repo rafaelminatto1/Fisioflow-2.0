@@ -1,4 +1,4 @@
-import { ReactNode, HTMLAttributes } from 'react';
+import React, { ReactNode, HTMLAttributes } from 'react';
 import { cn } from '../../utils/cn';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -78,7 +78,7 @@ interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 }
 
 const CardTitle = ({ children, className, level = 3, ...props }: CardTitleProps) => {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   
   const levelClasses = {
     1: 'text-2xl font-bold',

@@ -78,7 +78,11 @@ export const register = async (userData: {
 }): Promise<User> => {
   try {
     if (USE_SUPABASE) {
-      const { data, error, success } = await SupabaseAuthService.signUp(userData);
+      const mappedUserData = {
+        ...userData,
+        role: userData.role.toLowerCase() as 'therapist' | 'patient' | 'partner' | 'admin'
+      };
+      const { data, error, success } = await SupabaseAuthService.signUp(mappedUserData);
       
       if (!success || error) {
         throw new Error(error?.message || 'Erro ao criar conta');

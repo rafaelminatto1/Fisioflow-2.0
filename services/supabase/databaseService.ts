@@ -50,7 +50,7 @@ export class DatabaseService {
 
       // Apply filters
       if (options.filters) {
-        query = this.applyFilters(query, options.filters);
+        query = this.applyFilters(query, options.filters) as any;
       }
 
       // Apply ordering
@@ -71,14 +71,14 @@ export class DatabaseService {
         query = query.range(options.range.from, options.range.to);
       }
 
-      const { data, error, count } = await this.executeWithRetry(() => query);
+      const { data, error, count } = await query;
 
       if (error) {
         throw new Error(`Database select error: ${error.message}`);
       }
 
       return {
-        data: data || [],
+        data: (data || []) as T[],
         error: null,
         count: count || 0
       };
@@ -96,20 +96,18 @@ export class DatabaseService {
    */
   async selectById<T>(table: string, id: string, select?: string): Promise<DatabaseResponse<T>> {
     try {
-      const { data, error } = await this.executeWithRetry(() =>
-        supabase
-          .from(table)
-          .select(select || '*')
-          .eq('id', id)
-          .single()
-      );
+      const { data, error } = await supabase
+        .from(table)
+        .select(select || '*')
+        .eq('id', id)
+        .single();
 
       if (error) {
         throw new Error(`Database selectById error: ${error.message}`);
       }
 
       return {
-        data: data || null,
+        data: (data || null) as T | null,
         error: null
       };
     } catch (error) {
@@ -125,13 +123,11 @@ export class DatabaseService {
    */
   async insert<T>(table: string, data: Partial<T>): Promise<DatabaseResponse<T>> {
     try {
-      const { data: insertedData, error } = await this.executeWithRetry(() =>
-        supabase
-          .from(table)
-          .insert(data)
-          .select()
-          .single()
-      );
+      const { data: insertedData, error } = await supabase
+        .from(table)
+        .insert(data)
+        .select()
+        .single();
 
       if (error) {
         throw new Error(`Database insert error: ${error.message}`);
@@ -154,12 +150,10 @@ export class DatabaseService {
    */
   async insertMany<T>(table: string, data: Partial<T>[]): Promise<DatabaseListResponse<T>> {
     try {
-      const { data: insertedData, error } = await this.executeWithRetry(() =>
-        supabase
-          .from(table)
-          .insert(data)
-          .select()
-      );
+      const { data: insertedData, error } = await supabase
+        .from(table)
+        .insert(data)
+        .select();
 
       if (error) {
         throw new Error(`Database insertMany error: ${error.message}`);
@@ -182,14 +176,12 @@ export class DatabaseService {
    */
   async update<T>(table: string, id: string, data: Partial<T>): Promise<DatabaseResponse<T>> {
     try {
-      const { data: updatedData, error } = await this.executeWithRetry(() =>
-        supabase
-          .from(table)
-          .update(data)
-          .eq('id', id)
-          .select()
-          .single()
-      );
+      const { data: updatedData, error } = await supabase
+        .from(table)
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) {
         throw new Error(`Database update error: ${error.message}`);
@@ -217,11 +209,9 @@ export class DatabaseService {
   ): Promise<DatabaseListResponse<T>> {
     try {
       let query = supabase.from(table).update(data);
-      query = this.applyFilters(query, filters);
+      query = this.applyFilters(query, filters) as any;
 
-      const { data: updatedData, error } = await this.executeWithRetry(() =>
-        query.select()
-      );
+      const { data: updatedData, error } = await query.select();
 
       if (error) {
         throw new Error(`Database updateMany error: ${error.message}`);
@@ -244,12 +234,10 @@ export class DatabaseService {
    */
   async delete(table: string, id: string): Promise<DatabaseResponse<boolean>> {
     try {
-      const { error } = await this.executeWithRetry(() =>
-        supabase
-          .from(table)
-          .delete()
-          .eq('id', id)
-      );
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', id);
 
       if (error) {
         throw new Error(`Database delete error: ${error.message}`);
@@ -273,9 +261,9 @@ export class DatabaseService {
   async deleteMany(table: string, filters: Record<string, any>): Promise<DatabaseResponse<boolean>> {
     try {
       let query = supabase.from(table).delete();
-      query = this.applyFilters(query, filters);
+      query = this.applyFilters(query, filters) as any;
 
-      const { error } = await this.executeWithRetry(() => query);
+      const { error } = await query;
 
       if (error) {
         throw new Error(`Database deleteMany error: ${error.message}`);
@@ -298,9 +286,7 @@ export class DatabaseService {
    */
   async executeRaw<T>(query: string, params?: any[]): Promise<DatabaseListResponse<T>> {
     try {
-      const { data, error } = await this.executeWithRetry(() =>
-        supabase.rpc('execute_sql', { query, params })
-      );
+      const { data, error } = await supabase.rpc('execute_sql', { query, params });
 
       if (error) {
         throw new Error(`Database executeRaw error: ${error.message}`);
@@ -326,10 +312,10 @@ export class DatabaseService {
       let query = supabase.from(table).select('*', { count: 'exact', head: true });
 
       if (filters) {
-        query = this.applyFilters(query, filters);
+        query = this.applyFilters(query, filters) as any;
       }
 
-      const { count, error } = await this.executeWithRetry(() => query);
+      const { count, error } = await query;
 
       if (error) {
         throw new Error(`Database count error: ${error.message}`);
@@ -353,9 +339,9 @@ export class DatabaseService {
   async exists(table: string, filters: Record<string, any>): Promise<DatabaseResponse<boolean>> {
     try {
       let query = supabase.from(table).select('id', { count: 'exact', head: true });
-      query = this.applyFilters(query, filters);
+      query = this.applyFilters(query, filters) as any;
 
-      const { count, error } = await this.executeWithRetry(() => query);
+      const { count, error } = await query;
 
       if (error) {
         throw new Error(`Database exists error: ${error.message}`);
@@ -376,10 +362,10 @@ export class DatabaseService {
   /**
    * Apply filters to a query
    */
-  private applyFilters(
-    query: PostgrestFilterBuilder<any, any, any>,
+  private applyFilters<T extends Record<string, any>>(
+    query: PostgrestFilterBuilder<any, T, unknown>,
     filters: Record<string, any>
-  ): PostgrestFilterBuilder<any, any, any> {
+  ): PostgrestFilterBuilder<any, T, unknown> {
     Object.entries(filters).forEach(([key, value]) => {
       if (value === null) {
         query = query.is(key, null);

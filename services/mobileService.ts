@@ -5,7 +5,7 @@ import { Network, NetworkStatus } from '@capacitor/network';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { Keyboard } from '@capacitor/keyboard';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
@@ -181,7 +181,9 @@ class MobileService {
     if (!this.capabilities?.hasHaptics) return;
 
     try {
-      await Haptics.notification({ type });
+      const notificationType = type === 'success' ? NotificationType.Success :
+                              type === 'warning' ? NotificationType.Warning : NotificationType.Error;
+      await Haptics.notification({ type: notificationType });
     } catch (error) {
       console.error('Error triggering haptic notification:', error);
     }

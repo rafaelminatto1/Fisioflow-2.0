@@ -243,7 +243,7 @@ export const generateHep = async (data: HepFormData): Promise<string> => {
     const exerciseList = data.lista_exercicios.split(',').map(e => e.trim());
     const exercisesFormatted = exerciseList.map((ex, i) => `${i+1}. **${ex}**\n * **Como fazer:** ...`).join('\n\n');
     
-    let prompt = `
+    const prompt = `
 # Persona
 Você é um Fisioterapeuta especialista em Cinesiologia e Biomecânica. Sua habilidade é criar programas de exercícios seguros, eficazes e fáceis de entender para pacientes leigos.
 

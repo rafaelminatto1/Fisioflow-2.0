@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { Appointment, Patient, Therapist } from '../types';
+import { Appointment, Patient, Therapist, AppointmentStatus } from '../types';
 import * as appointmentService from '../services/appointmentService';
 import * as patientService from '../services/patientService';
 import * as therapistService from '../services/therapistService';
@@ -81,9 +81,14 @@ const RecentAppointments = ({ appointments }: { appointments: Appointment[] }) =
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {new Date(appointment.date).toLocaleDateString('pt-BR')}
+                  {new Date(appointment.startTime).toLocaleDateString('pt-BR')}
                 </p>
-                <p className="text-sm text-gray-600">{appointment.time}</p>
+                <p className="text-sm text-gray-600">
+                  {new Date(appointment.startTime).toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </p>
               </div>
             </div>
           ))
@@ -130,7 +135,7 @@ const DashboardPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const { user } = useAuth();
-    const { addToast } = useToast();
+    const { success, error: showError, showToast } = useToast();
 
     useEffect(() => {
       const loadDashboardData = async () => {
@@ -149,18 +154,14 @@ const DashboardPage: React.FC = () => {
           setTherapists(therapistsData);
         } catch (err: any) {
           setError(err.message || 'Erro ao carregar dados do dashboard');
-          addToast({
-            type: 'error',
-            title: 'Erro ao carregar dashboard',
-            message: 'Não foi possível carregar os dados. Tente novamente.',
-          });
+          showError('Não foi possível carregar os dados. Tente novamente.');
         } finally {
           setIsLoading(false);
         }
       };
 
       loadDashboardData();
-    }, [addToast]);
+    }, [showToast]);
 
     if (isLoading) {
       return (
@@ -197,17 +198,17 @@ const DashboardPage: React.FC = () => {
 
     // Calculate stats
     const todayAppointments = appointments.filter(apt => 
-      new Date(apt.date).toDateString() === new Date().toDateString()
+      new Date(apt.startTime).toDateString() === new Date().toDateString()
     ).length;
     
-    const activePatients = patients.filter(patient => patient.status === 'active').length;
-    const completedAppointments = appointments.filter(apt => apt.status === 'completed').length;
-    const pendingAppointments = appointments.filter(apt => apt.status === 'scheduled').length;
+    const activePatients = patients.filter(patient => patient.status === 'Active').length;
+    const completedAppointments = appointments.filter(apt => apt.status === AppointmentStatus.Completed).length;
+    const pendingAppointments = appointments.filter(apt => apt.status === AppointmentStatus.Scheduled).length;
 
     return (
         <div className="space-y-6">
             <PageHeader
-                title={`Bem-vindo, ${user?.profile.firstName}!`}
+                title={`Bem-vindo, ${user?.name.split(' ')[0]}!`}
                 subtitle="Visão geral da sua clínica e atividades do dia."
             />
 

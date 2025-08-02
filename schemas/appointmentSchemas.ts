@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { validationMessages } from '../utils/formUtils';
 import { AppointmentType, AppointmentStatus } from '../types';
 
-// Appointment schemas
-export const appointmentSchema = z.object({
+// Base appointment schema without refinement
+const appointmentBaseSchema = z.object({
   patientId: z.string().min(1, validationMessages.required),
   therapistId: z.string().min(1, validationMessages.required),
   
@@ -31,7 +31,10 @@ export const appointmentSchema = z.object({
     days: z.array(z.number().min(0).max(6)),
     until: z.string(),
   }).optional(),
-}).refine((data) => {
+});
+
+// Appointment schemas with validation
+export const appointmentSchema = appointmentBaseSchema.refine((data) => {
   const start = new Date(data.startTime);
   const end = new Date(data.endTime);
   return end > start;
@@ -40,7 +43,7 @@ export const appointmentSchema = z.object({
   path: ['endTime'],
 });
 
-export const appointmentUpdateSchema = appointmentSchema.extend({
+export const appointmentUpdateSchema = appointmentBaseSchema.extend({
   id: z.string().min(1, validationMessages.required),
   status: z.nativeEnum(AppointmentStatus),
   paymentStatus: z.enum(['paid', 'pending']),

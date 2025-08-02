@@ -130,7 +130,7 @@ const PartnerQuickActions = () => {
 
 const EducatorDashboardPage: React.FC = () => {
     const { user } = useAuth();
-    const { addToast } = useToast();
+    const { success, error } = useToast();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -158,7 +158,7 @@ const EducatorDashboardPage: React.FC = () => {
     return (
         <div className="space-y-6">
             <PageHeader
-                title={`Boas-vindas, ${user?.profile.firstName}!`}
+                title={`Boas-vindas, ${user?.name.split(' ')[0]}!`}
                 subtitle="Acompanhe os pacientes encaminhados e seus progressos."
             />
 

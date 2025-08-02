@@ -2,7 +2,7 @@
 import { Notification, Role } from '../types';
 import { mockNotifications, mockUsers } from '../data/mockData';
 
-let notifications: Notification[] = [...mockNotifications];
+const notifications: Notification[] = [...mockNotifications];
 
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 

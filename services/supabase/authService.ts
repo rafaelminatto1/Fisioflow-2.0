@@ -148,6 +148,29 @@ export class AuthService {
   }
 
   /**
+   * Update password for current user
+   */
+  static async updatePassword(newPassword: string): Promise<AuthServiceResponse<void>> {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (error) {
+        return { data: null, error, success: false };
+      }
+      
+      return { data: null, error: null, success: true };
+    } catch (error) {
+      return { 
+        data: null, 
+        error: error instanceof Error ? error : new Error('Unknown update password error'), 
+        success: false 
+      };
+    }
+  }
+
+  /**
    * Get current session
    */
   static async getCurrentSession(): Promise<AuthServiceResponse<Session>> {

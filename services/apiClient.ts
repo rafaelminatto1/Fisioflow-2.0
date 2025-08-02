@@ -4,7 +4,7 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-interface ApiError {
+interface ApiErrorData {
   message: string;
   status: number;
   code?: string;

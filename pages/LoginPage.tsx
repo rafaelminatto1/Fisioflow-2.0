@@ -3,24 +3,12 @@ import { useState } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { loginSchema, type LoginFormData } from '../schemas/authSchemas';
+import { Role } from '../types';
 import { Stethoscope, Loader, Eye, EyeOff, AlertCircle, Mail } from 'lucide-react';
 
-// Validation schema
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email é obrigatório')
-    .email('Email inválido'),
-  password: z
-    .string()
-    .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter pelo menos 6 caracteres'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,8 +17,8 @@ const LoginPage = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   
-  const { signIn } = useAuth();
-  const { addToast } = useToast();
+  const { login, resetPassword } = useAuth();
+  const { success, error } = useToast();
   const navigate = ReactRouterDOM.useNavigate();
   const location = ReactRouterDOM.useLocation();
   
@@ -55,49 +43,26 @@ const LoginPage = () => {
     clearErrors();
 
     try {
-      const response = await signIn(data.email, data.password);
-      
-      if (response.error) {
-        setError('root', { 
-          type: 'manual', 
-          message: response.error 
-        });
-        addToast({
-          type: 'error',
-          title: 'Erro no Login',
-          message: response.error,
-        });
-        return;
-      }
+      const user = await login(data.email, data.password);
 
-      if (response.user) {
-        addToast({
-          type: 'success',
-          title: 'Login realizado com sucesso!',
-          message: `Bem-vindo, ${response.user.profile.firstName}!`,
-        });
+      success(`Bem-vindo, ${user.name}!`);
 
-        // Redirect based on role
-        let destination = from === '/' ? '/dashboard' : from;
-        if (response.user.role === 'patient') {
-          destination = from === '/' ? '/portal/dashboard' : from;
-        } else if (response.user.role === 'partner') {
-          destination = from === '/' ? '/partner/dashboard' : from;
-        }
-          
-        navigate(destination, { replace: true });
+      // Redirect based on role  
+      let destination = from === '/' ? '/dashboard' : from;
+      if (user.role === Role.Patient) {
+        destination = from === '/' ? '/portal/dashboard' : from;
+      } else if (user.role === Role.EducadorFisico) {
+        destination = from === '/' ? '/partner/dashboard' : from;
       }
+        
+      navigate(destination, { replace: true });
     } catch (err: any) {
       const errorMessage = err.message || 'Falha no login. Verifique suas credenciais.';
       setError('root', { 
         type: 'manual', 
         message: errorMessage 
       });
-      addToast({
-        type: 'error',
-        title: 'Erro no Login',
-        message: errorMessage,
-      });
+      error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -107,34 +72,21 @@ const LoginPage = () => {
     e.preventDefault();
     
     if (!resetEmail) {
-      addToast({
-        type: 'error',
-        title: 'Email obrigatório',
-        message: 'Por favor, insira seu email para recuperar a senha.',
-      });
+      error('Por favor, insira seu email para recuperar a senha.');
       return;
     }
 
     setResetLoading(true);
 
     try {
-      // In a real implementation, this would call the password reset service
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      await resetPassword(resetEmail);
       
-      addToast({
-        type: 'success',
-        title: 'Email enviado!',
-        message: 'Instruções para redefinir sua senha foram enviadas para seu email.',
-      });
+      success('Instruções para redefinir sua senha foram enviadas para seu email.');
       
       setShowForgotPassword(false);
       setResetEmail('');
-    } catch (error) {
-      addToast({
-        type: 'error',
-        title: 'Erro ao enviar email',
-        message: 'Não foi possível enviar o email de recuperação. Tente novamente.',
-      });
+    } catch (err: any) {
+      error(err.message || 'Não foi possível enviar o email de recuperação. Tente novamente.');
     } finally {
       setResetLoading(false);
     }

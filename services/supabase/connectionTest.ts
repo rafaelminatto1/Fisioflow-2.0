@@ -1,4 +1,4 @@
-import { supabase, testSupabaseConnection } from './client';
+import { supabase, testConnection } from './supabaseClient';
 import { AuthService } from './authService';
 import { DatabaseService } from './databaseService';
 import { StorageService } from './storageService';
@@ -67,7 +67,7 @@ export class SupabaseConnectionTester {
    */
   private static async testConnection(): Promise<ConnectionTestResult> {
     try {
-      const isConnected = await testSupabaseConnection();
+      const isConnected = await testConnection();
       
       if (isConnected) {
         return {

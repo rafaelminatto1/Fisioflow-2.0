@@ -2,7 +2,7 @@
 import { PainLog } from '../types';
 import { mockPainLogs } from '../data/mockData';
 
-let painLogs: PainLog[] = [...mockPainLogs];
+const painLogs: PainLog[] = [...mockPainLogs];
 
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 

@@ -82,7 +82,11 @@ class ErrorLoggingService {
 
   private async sendErrorToDatabase(errorLog: ErrorLog): Promise<void> {
     try {
-      await DatabaseService.create('error_logs', errorLog);
+      const dbService = DatabaseService.getInstance();
+      const result = await dbService.insert('error_logs', errorLog);
+      if (result.error) {
+        throw new Error(result.error);
+      }
     } catch (error) {
       // If database is not available, don't throw - just queue
       throw new Error(`Database logging failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -169,13 +173,20 @@ class ErrorLoggingService {
 
       const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
       
-      const { data: errors } = await DatabaseService.query('error_logs', {
-        filters: [
-          { field: 'timestamp', operator: 'gte', value: since }
-        ],
-        orderBy: [{ field: 'timestamp', direction: 'desc' }],
+      const dbService = DatabaseService.getInstance();
+      const result = await dbService.select<ErrorLog>('error_logs', {
+        filters: {
+          timestamp: { operator: 'gte', value: since }
+        },
+        orderBy: [{ column: 'timestamp', ascending: false }],
         limit: 1000,
       });
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      
+      const errors = result.data;
 
       if (!errors || errors.length === 0) {
         return {
@@ -211,11 +222,14 @@ class ErrorLoggingService {
     try {
       const cutoffDate = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000).toISOString();
       
-      await DatabaseService.delete('error_logs', {
-        filters: [
-          { field: 'timestamp', operator: 'lt', value: cutoffDate }
-        ]
+      const dbService = DatabaseService.getInstance();
+      const result = await dbService.deleteMany('error_logs', {
+        timestamp: { operator: 'lt', value: cutoffDate }
       });
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error('Failed to clear old errors:', error);
     }

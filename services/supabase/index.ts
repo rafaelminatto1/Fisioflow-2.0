@@ -13,7 +13,8 @@ export type {
 
 export type { 
   QueryOptions, 
-  DatabaseServiceResponse 
+  DatabaseResponse,
+  DatabaseListResponse
 } from './databaseService';
 
 export type { 
@@ -26,7 +27,5 @@ export type {
   User,
   Session,
   AuthError,
-  PostgrestError,
-  StorageError,
-  FileObject
+  PostgrestError
 } from '@supabase/supabase-js';
