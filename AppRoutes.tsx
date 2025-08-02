@@ -26,6 +26,7 @@ import MaterialDetailPage from './pages/MaterialDetailPage';
 import SpecialtyAssessmentsPage from './pages/SpecialtyAssessmentsPage';
 import EconomicPage from './pages/EconomicPage';
 import ClinicalAnalyticsPage from './pages/ClinicalAnalyticsPage';
+import PatientAnalyticsPage from './pages/PatientAnalyticsPage';
 import FinancialDashboardPage from './pages/FinancialDashboardPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import LegalPage from './pages/LegalPage';
@@ -114,6 +115,7 @@ const AppRoutes = () => {
                     <ReactRouterDOM.Route path="/clinical-analytics" element={<ClinicalAnalyticsPage />} />
                     <ReactRouterDOM.Route path="/financials" element={<FinancialDashboardPage />} />
                     <ReactRouterDOM.Route path="/patients" element={<PatientListPage />} />
+                    <ReactRouterDOM.Route path="/patients/analytics" element={<PatientAnalyticsPage />} />
                     <ReactRouterDOM.Route path="/patients/:id" element={<PatientDetailPage />} />
                     <ReactRouterDOM.Route path="/agenda" element={<AgendaPage />} />
                     <ReactRouterDOM.Route path="/notifications" element={<NotificationCenterPage />} />

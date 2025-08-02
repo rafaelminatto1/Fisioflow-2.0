@@ -1,15 +1,16 @@
 // hooks/usePatients.ts
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { Patient } from '../types';
 import * as patientService from '../services/patientService';
 import { useToast } from '../contexts/ToastContext';
+import { AuthContext } from '../contexts/AuthContext';
 
 interface UsePatientsResult {
   patients: Patient[];
   isLoading: boolean;
   error: Error | null;
   addPatient: (patientData: Omit<Patient, 'id' | 'lastVisit'>) => Promise<Patient | undefined>;
-  updatePatient: (patientData: Patient) => Promise<Patient | undefined>;
+  updatePatient: (patientData: Patient, changes?: Record<string, any>) => Promise<Patient | undefined>;
 }
 
 export const usePatients = (): UsePatientsResult => {
@@ -17,6 +18,7 @@ export const usePatients = (): UsePatientsResult => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const { showToast } = useToast();
+  const { user } = useContext(AuthContext);
 
   const fetchPatients = useCallback(async () => {
     setIsLoading(true);
@@ -37,8 +39,17 @@ export const usePatients = (): UsePatientsResult => {
   }, [fetchPatients]);
 
   const addPatient = async (patientData: Omit<Patient, 'id' | 'lastVisit'>): Promise<Patient | undefined> => {
+    if (!user) {
+      showToast("Usuário não autenticado.", "error");
+      return undefined;
+    }
+
     try {
-      const newPatient = await patientService.addPatient(patientData);
+      const newPatient = await patientService.addPatientWithAudit(
+        patientData,
+        user.id,
+        user.name
+      );
       // Refetch to maintain the sorted order from the service
       await fetchPatients(); 
       showToast("Paciente adicionado com sucesso!", "success");
@@ -49,16 +60,26 @@ export const usePatients = (): UsePatientsResult => {
     }
   };
 
-  const updatePatient = async (patientData: Patient): Promise<Patient | undefined> => {
-      try {
-          const updatedPatient = await patientService.updatePatient(patientData);
-          setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
-          showToast("Paciente atualizado com sucesso!", "success");
-          return updatedPatient;
-      } catch (err) {
-          showToast("Falha ao atualizar paciente.", "error");
-          return undefined;
-      }
+  const updatePatient = async (patientData: Patient, changes?: Record<string, any>): Promise<Patient | undefined> => {
+    if (!user) {
+      showToast("Usuário não autenticado.", "error");
+      return undefined;
+    }
+
+    try {
+      const updatedPatient = await patientService.updatePatientWithAudit(
+        patientData,
+        user.id,
+        user.name,
+        changes
+      );
+      setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
+      showToast("Paciente atualizado com sucesso!", "success");
+      return updatedPatient;
+    } catch (err) {
+      showToast("Falha ao atualizar paciente.", "error");
+      return undefined;
+    }
   };
 
 

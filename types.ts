@@ -52,6 +52,7 @@ export interface Patient {
   birthDate: string;
   phone: string;
   email: string;
+  gender?: string;
   emergencyContact: {
     name: string;
     phone:string;
@@ -62,17 +63,18 @@ export interface Patient {
     state: string;
     zip: string;
   };
-  status: 'Active' | 'Inactive' | 'Discharged';
+  status: 'Ativo' | 'Inativo' | 'Alta';
   lastVisit: string;
-  registrationDate: string;
+  registrationDate?: string;
   avatarUrl: string;
   consentGiven: boolean;
   allergies?: string;
   medicalAlerts?: string;
   surgeries?: Surgery[];
-  conditions?: Condition[];
+  conditions?: string[];
   attachments?: PatientAttachment[];
   trackedMetrics?: TrackedMetric[];
+  therapistId?: string;
 }
 
 export interface Therapist {
@@ -455,4 +457,414 @@ export interface Notification {
   isRead: boolean;
   createdAt: Date;
   type: 'task_assigned' | 'announcement' | 'appointment_reminder';
+}
+
+// --- Enhanced Patient Management Types ---
+
+// Enhanced Patient Interfaces
+export interface EnhancedPatient extends Patient {
+  // Analytics fields
+  riskScore?: number;
+  engagementLevel?: 'low' | 'medium' | 'high';
+  predictedChurn?: number;
+  lifetimeValue?: number;
+  
+  // Enhanced tracking
+  tags?: PatientTag[];
+  customFields?: CustomField[];
+  preferences?: PatientPreferences;
+}
+
+export interface PatientTag {
+  id: string;
+  name: string;
+  color: string;
+  category: string;
+}
+
+export interface CustomField {
+  id: string;
+  name: string;
+  type: 'text' | 'number' | 'date' | 'boolean' | 'select';
+  value: any;
+  required: boolean;
+}
+
+export interface PatientPreferences {
+  communicationChannel: 'email' | 'sms' | 'whatsapp';
+  appointmentReminders: boolean;
+  marketingEmails: boolean;
+  dataSharing: boolean;
+}
+
+// Enhanced Document Management
+export interface PatientDocument extends PatientAttachment {
+  id: string;
+  category: DocumentCategory;
+  tags: string[];
+  annotations?: Annotation[];
+  version: number;
+  extractedText?: string;
+  shareLinks: ShareLink[];
+  uploadedBy?: string;
+  uploadedAt: Date;
+}
+
+export interface DocumentCategory {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+}
+
+export interface Annotation {
+  id: string;
+  userId: string;
+  userName: string;
+  text: string;
+  position: { x: number; y: number };
+  createdAt: Date;
+}
+
+export interface ShareLink {
+  id: string;
+  url: string;
+  expiresAt: Date;
+  accessCount: number;
+  maxAccess: number;
+  password?: string;
+}
+
+// Enhanced Metrics
+export interface EnhancedMetric extends TrackedMetric {
+  template?: MetricTemplate;
+  predictions: MetricPrediction[];
+  alerts: MetricAlert[];
+  correlations: MetricCorrelation[];
+  normalRanges?: { min: number; max: number; ageGroup: string }[];
+}
+
+export interface MetricTemplate {
+  id: string;
+  name: string;
+  specialty: string;
+  defaultUnit: string;
+  normalRanges: { min: number; max: number; ageGroup: string }[];
+  alertThresholds: { value: number; severity: 'low' | 'medium' | 'high' }[];
+  description?: string;
+}
+
+export interface MetricPrediction {
+  date: Date;
+  predictedValue: number;
+  confidence: number;
+  trend: 'improving' | 'stable' | 'declining';
+  factors?: string[];
+}
+
+export interface MetricAlert {
+  id: string;
+  type: 'threshold' | 'trend' | 'anomaly';
+  severity: 'low' | 'medium' | 'high';
+  message: string;
+  triggeredAt: Date;
+  acknowledged: boolean;
+  acknowledgedBy?: string;
+  acknowledgedAt?: Date;
+}
+
+export interface MetricCorrelation {
+  withMetricId: string;
+  withMetricName: string;
+  correlationValue: number; // -1 to 1
+  significance: number; // 0 to 1
+}
+
+// Search and Filtering
+export interface SearchFilters {
+  text: string;
+  status: string[];
+  ageRange: [number, number];
+  registrationDateRange: [Date | null, Date | null];
+  lastVisitRange: [Date | null, Date | null];
+  therapistIds: string[];
+  hasConditions: string[];
+  hasSurgeries: boolean | null;
+  tags?: string[];
+  customFilters?: Record<string, any>;
+}
+
+export interface SavedSearch {
+  id: string;
+  name: string;
+  filters: SearchFilters;
+  createdAt: Date;
+  userId: string;
+  isShared?: boolean;
+}
+
+export interface SearchResult {
+  patients: Patient[];
+  totalCount: number;
+  facets: SearchFacets;
+  suggestions?: SearchSuggestion[];
+}
+
+export interface SearchFacets {
+  statuses: { value: string; count: number }[];
+  therapists: { id: string; name: string; count: number }[];
+  conditions: { value: string; count: number }[];
+  ageGroups: { range: string; count: number }[];
+  tags?: { value: string; count: number }[];
+}
+
+export interface SearchSuggestion {
+  type: 'patient' | 'condition' | 'therapist' | 'tag';
+  value: string;
+  label: string;
+  score: number;
+}
+
+// Import/Export
+export interface ImportResults {
+  totalRows: number;
+  successCount: number;
+  errorCount: number;
+  errors: ImportError[];
+  duplicatesFound: number;
+  warnings?: string[];
+}
+
+export interface ImportError {
+  row: number;
+  field: string;
+  message: string;
+  value: string;
+  severity: 'error' | 'warning';
+}
+
+export interface ExportOptions {
+  format: 'csv' | 'xlsx' | 'pdf';
+  fields: string[];
+  filters?: Partial<SearchFilters>;
+  includeDocuments?: boolean;
+  includeMetrics?: boolean;
+}
+
+// Analytics and Reporting
+export interface AnalyticsMetric {
+  id: string;
+  name: string;
+  value: number;
+  trend: number;
+  period: 'day' | 'week' | 'month' | 'year';
+  calculatedAt: Date;
+  filters?: Record<string, any>;
+  previousValue?: number;
+}
+
+export interface PatientSegment {
+  id: string;
+  name: string;
+  criteria: SegmentCriteria;
+  patientCount: number;
+  lastUpdated: Date;
+  color?: string;
+  description?: string;
+}
+
+export interface SegmentCriteria {
+  ageRange?: [number, number];
+  conditions?: string[];
+  treatmentDuration?: [number, number];
+  engagementLevel?: string[];
+  status?: string[];
+  therapistIds?: string[];
+  tags?: string[];
+  customFilters?: Record<string, any>;
+}
+
+export interface DemographicData {
+  ageDistribution: { range: string; count: number; percentage: number }[];
+  genderDistribution: { gender: string; count: number; percentage: number }[];
+  statusDistribution: { status: string; count: number; percentage: number }[];
+  conditionDistribution: { condition: string; count: number; percentage: number }[];
+}
+
+export interface TrendData {
+  period: string;
+  newPatients: number;
+  activePatients: number;
+  dischargedPatients: number;
+  totalAppointments: number;
+  retention?: number;
+}
+
+export interface PredictiveMetrics {
+  churnRisk: { patientId: string; patientName: string; score: number; factors: string[] }[];
+  demandForecast: { period: string; predictedAppointments: number; confidence: number }[];
+  lifetimeValuePrediction: { segment: string; averageLTV: number; confidence: number }[];
+}
+
+export interface PerformanceMetrics {
+  patientRetentionRate: number;
+  averageTreatmentDuration: number;
+  appointmentShowRate: number;
+  patientSatisfactionScore: number;
+  revenuePerPatient: number;
+  newPatientAcquisitionRate: number;
+}
+
+// Compliance and Audit
+export interface ConsentStatus {
+  dataProcessing: ConsentRecord;
+  dataSharing: ConsentRecord;
+  marketing: ConsentRecord;
+  research: ConsentRecord;
+}
+
+export interface ConsentRecord {
+  granted: boolean;
+  grantedAt?: Date;
+  expiresAt?: Date;
+  revokedAt?: Date;
+  version: string;
+  ipAddress?: string;
+  userAgent?: string;
+  witnessId?: string;
+  witnessName?: string;
+}
+
+export interface DataRetentionPolicy {
+  patientDataRetentionYears: number;
+  auditLogRetentionYears: number;
+  automaticDeletionEnabled: boolean;
+  lastPolicyUpdate: Date;
+  exceptions?: DataRetentionException[];
+}
+
+export interface DataRetentionException {
+  resourceType: string;
+  resourceId: string;
+  retentionYears: number;
+  reason: string;
+  approvedBy: string;
+  approvedAt: Date;
+}
+
+export interface ComplianceReport {
+  id: string;
+  type: 'audit' | 'consent' | 'retention' | 'security';
+  generatedAt: Date;
+  period: { start: Date; end: Date };
+  summary: ComplianceReportSummary;
+  details: any;
+  format: 'json' | 'pdf' | 'csv';
+  generatedBy: string;
+}
+
+export interface ComplianceReportSummary {
+  totalDataAccess: number;
+  consentViolations: number;
+  retentionViolations: number;
+  securityIncidents: number;
+  complianceScore: number; // 0-100
+  recommendations?: string[];
+}
+
+export interface DataDeletionRequest {
+  id: string;
+  patientId: string;
+  patientName: string;
+  requestedBy: string;
+  requestDate: Date;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
+  approvedBy?: string;
+  approvedAt?: Date;
+  completedAt?: Date;
+  deletedData: string[];
+  retainedData: string[];
+  retentionReason?: string;
+  estimatedCompletionDate?: Date;
+}
+
+// Error Handling
+export interface PatientManagementError extends Error {
+  code: string;
+  category: 'validation' | 'permission' | 'system' | 'compliance';
+  details?: Record<string, any>;
+  userMessage: string;
+  technicalMessage: string;
+  suggestions?: string[];
+}
+
+export interface ValidationRule {
+  field: string;
+  type: 'required' | 'format' | 'unique' | 'custom';
+  message: string;
+  validator?: (value: any, context: any) => boolean;
+}
+
+// UI State Management
+export interface PatientListState {
+  patients: Patient[];
+  filteredPatients: Patient[];
+  filters: Partial<SearchFilters>;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+  currentPage: number;
+  pageSize: number;
+  totalCount: number;
+  loading: boolean;
+  error?: string;
+  selectedPatients: string[];
+}
+
+export interface PatientDetailState {
+  patient?: Patient;
+  documents: PatientDocument[];
+  metrics: EnhancedMetric[];
+  auditLog: AuditLogEntry[];
+  consentStatus: ConsentStatus;
+  loading: boolean;
+  error?: string;
+  activeTab: string;
+}
+
+// Workflow and Notifications
+export interface WorkflowStep {
+  id: string;
+  name: string;
+  description: string;
+  required: boolean;
+  completed: boolean;
+  completedAt?: Date;
+  completedBy?: string;
+  dependencies?: string[];
+}
+
+export interface PatientWorkflow {
+  id: string;
+  patientId: string;
+  type: 'admission' | 'treatment' | 'discharge';
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  steps: WorkflowStep[];
+  startedAt: Date;
+  completedAt?: Date;
+  assignedTo?: string;
+}
+
+export interface PatientNotification {
+  id: string;
+  patientId: string;
+  type: 'appointment_reminder' | 'status_change' | 'document_ready' | 'treatment_complete';
+  title: string;
+  message: string;
+  channel: 'email' | 'sms' | 'whatsapp' | 'push';
+  scheduled: Date;
+  sent?: Date;
+  delivered?: Date;
+  read?: Date;
+  status: 'pending' | 'sent' | 'delivered' | 'failed';
 }
