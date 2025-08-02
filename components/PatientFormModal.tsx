@@ -20,7 +20,7 @@ const getInitialFormData = (): Omit<Patient, 'id' | 'lastVisit'> => ({
   email: '',
   emergencyContact: { name: '', phone: '' },
   address: { street: '', city: '', state: '', zip: '' },
-  status: 'Active',
+  status: 'Ativo',
   registrationDate: new Date().toISOString(),
   avatarUrl: `https://picsum.photos/seed/${Date.now()}/200/200`,
   consentGiven: false,

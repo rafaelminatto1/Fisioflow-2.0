@@ -13,7 +13,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { 
-  AuditLog, 
+  AuditLogEntry as AuditLog, 
   ConsentStatus, 
   DataDeletionRequest,
   ComplianceReport 

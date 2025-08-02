@@ -46,7 +46,7 @@ export interface UseAdvancedSearchReturn {
   clearSuggestions: () => void;
   
   // Saved searches
-  saveCurrentSearch: (name: string) => Promise<void>;
+  saveCurrentSearch: (name: string) => Promise<SavedSearch>;
   loadSavedSearch: (search: SavedSearch) => void;
   deleteSavedSearch: (searchId: string) => Promise<void>;
   
