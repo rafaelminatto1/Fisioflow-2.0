@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vitest run:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(touch:*)",
+      "Bash(npm install:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)"
+    ],
+    "deny": []
+  }
+}

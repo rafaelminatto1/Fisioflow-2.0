@@ -1,4 +1,3 @@
-import React from 'react';
 import { Appointment, Therapist, AppointmentStatus } from '../types';
 import { Repeat } from 'lucide-react';
 
@@ -8,7 +7,7 @@ interface AppointmentCardProps {
   onSelect: () => void;
 }
 
-const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, therapists, onSelect }) => {
+const AppointmentCard = ({ appointment, therapists, onSelect }: AppointmentCardProps) => {
   const startHour = appointment.startTime.getHours();
   const startMinutes = appointment.startTime.getMinutes();
   const endHour = appointment.endTime.getHours();

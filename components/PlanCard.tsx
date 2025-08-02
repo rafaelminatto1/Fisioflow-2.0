@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { CheckCircle, Star } from 'lucide-react';
 
 interface Plan {
@@ -15,7 +14,7 @@ interface PlanCardProps {
     plan: Plan;
 }
 
-const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
+const PlanCard = ({ plan }: PlanCardProps) => {
     return (
         <div className={`rounded-2xl border-2 p-6 flex flex-col h-full transition-all duration-300 ${plan.popular ? 'border-sky-500 shadow-lg bg-white' : 'border-slate-200 bg-white'}`}>
              {plan.popular && (

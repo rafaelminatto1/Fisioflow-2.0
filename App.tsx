@@ -1,13 +1,15 @@
 
-import React from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
 import AppRoutes from './AppRoutes';
+import { ErrorBoundaryProvider } from './components/ErrorBoundaryProvider';
 
-const App: React.FC = () => {
+const App = () => {
   return (
-    <ReactRouterDOM.HashRouter>
-      <AppRoutes />
-    </ReactRouterDOM.HashRouter>
+    <ErrorBoundaryProvider>
+      <ReactRouterDOM.HashRouter>
+        <AppRoutes />
+      </ReactRouterDOM.HashRouter>
+    </ErrorBoundaryProvider>
   );
 };
 

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Save, Trash2, AlertTriangle, Calendar, Clock, User, ClipboardList, Tag, Repeat, FileText, MessageSquarePlus, Loader, Clipboard, Check, MessageSquare, Hash, Lightbulb, DollarSign } from 'lucide-react';
 import { Appointment, Patient, AppointmentStatus, AppointmentType, Therapist, RecurrenceRule } from '../types';
 import RecurrenceSelector from './RecurrenceSelector';

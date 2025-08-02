@@ -1,10 +1,9 @@
-import React from 'react';
 
 interface SkeletonProps {
   className?: string;
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({ className }) => {
+const Skeleton = ({ className }: SkeletonProps) => {
   return <div className={`bg-slate-200 animate-pulse ${className}`} />;
 };
 

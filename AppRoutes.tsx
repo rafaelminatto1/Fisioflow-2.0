@@ -1,10 +1,10 @@
 
 
-import React from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import PatientListPage from './pages/PatientListPage';
 import PatientDetailPage from './pages/PatientDetailPage';
@@ -55,10 +55,11 @@ import PartnerExerciseLibraryPage from './pages/partner-portal/PartnerExerciseLi
 import FinancialsPage from './pages/partner-portal/FinancialsPage';
 
 
-const AppRoutes: React.FC = () => {
+const AppRoutes = () => {
     return (
         <ReactRouterDOM.Routes>
           <ReactRouterDOM.Route path="/login" element={<LoginPage />} />
+          <ReactRouterDOM.Route path="/register" element={<RegisterPage />} />
           
            {/* Patient Portal Routes */}
            <ReactRouterDOM.Route 

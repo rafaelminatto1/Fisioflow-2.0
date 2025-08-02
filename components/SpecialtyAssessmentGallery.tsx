@@ -1,5 +1,4 @@
 // components/SpecialtyAssessmentGallery.tsx
-import React from 'react';
 import useAssessmentSpecialties from '../hooks/useAssessmentSpecialties';
 import { Specialty } from '../types';
 import Skeleton from './ui/Skeleton';
@@ -8,7 +7,7 @@ interface SpecialtyAssessmentGalleryProps {
   onSelectSpecialty: (specialty: Specialty) => void;
 }
 
-const SpecialtyAssessmentGallery: React.FC<SpecialtyAssessmentGalleryProps> = ({ onSelectSpecialty }) => {
+const SpecialtyAssessmentGallery = ({ onSelectSpecialty }: SpecialtyAssessmentGalleryProps) => {
   const { specialties, isLoading } = useAssessmentSpecialties();
 
   if (isLoading) {

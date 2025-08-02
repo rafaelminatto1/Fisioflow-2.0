@@ -1,13 +1,11 @@
 
-import React from 'react';
-
 interface PageHeaderProps {
   title: string;
   subtitle: string;
   children?: React.ReactNode;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, children }) => {
+const PageHeader = ({ title, subtitle, children }: PageHeaderProps) => {
   return (
     <div className="mb-6 md:flex md:items-center md:justify-between">
       <div className="flex-1 min-w-0">

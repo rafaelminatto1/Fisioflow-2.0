@@ -1,37 +1,120 @@
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { ToastMessage, ToastContextType } from '../types';
+import { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import Toast from '../components/ui/Toast';
 
-// The full internal type for the context value, including all properties
-interface FullToastContextType {
-  toasts: ToastMessage[];
-  showToast: (message: string, type: 'success' | 'error' | 'info') => void;
-  removeToast: (id: number) => void;
+export interface ToastMessage {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  persistent?: boolean;
 }
 
-const ToastContext = createContext<FullToastContextType | undefined>(undefined);
+export interface ToastContextType {
+  showToast: (
+    message: string, 
+    type?: ToastMessage['type'], 
+    options?: {
+      duration?: number;
+      action?: ToastMessage['action'];
+      persistent?: boolean;
+    }
+  ) => string;
+  success: (message: string, options?: Omit<Parameters<ToastContextType['showToast']>[2], 'type'>) => string;
+  error: (message: string, options?: Omit<Parameters<ToastContextType['showToast']>[2], 'type'>) => string;
+  info: (message: string, options?: Omit<Parameters<ToastContextType['showToast']>[2], 'type'>) => string;
+  warning: (message: string, options?: Omit<Parameters<ToastContextType['showToast']>[2], 'type'>) => string;
+}
 
-export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+const DEFAULT_DURATION = 5000;
+
+export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    const id = Date.now();
-    setToasts(prevToasts => [...prevToasts, { id, message, type }]);
+  const showToast = useCallback((
+    message: string, 
+    type: ToastMessage['type'] = 'info',
+    options: {
+      duration?: number;
+      action?: ToastMessage['action'];
+      persistent?: boolean;
+    } = {}
+  ): string => {
+    const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const duration = options.persistent ? undefined : (options.duration ?? DEFAULT_DURATION);
     
-    // The auto-dismiss logic is primarily handled in the Toast component for animation,
-    // but this acts as a fallback.
-    setTimeout(() => {
-      removeToast(id);
-    }, 5000);
+    const newToast: ToastMessage = {
+      id,
+      message,
+      type,
+      duration,
+      action: options.action,
+      persistent: options.persistent,
+    };
+    
+    setToasts(prev => [...prev, newToast]);
+    
+    // Auto remove after duration if not persistent
+    if (!options.persistent && duration) {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(toast => toast.id !== id));
+      }, duration);
+    }
+
+    return id;
+  }, []);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+
+  // Convenience methods
+  const success = useCallback((message: string, options = {}) => 
+    showToast(message, 'success', options), [showToast]
+  );
+
+  const error = useCallback((message: string, options = {}) => 
+    showToast(message, 'error', options), [showToast]
+  );
+
+  const info = useCallback((message: string, options = {}) => 
+    showToast(message, 'info', options), [showToast]
+  );
+
+  const warning = useCallback((message: string, options = {}) => 
+    showToast(message, 'warning', options), [showToast]
+  );
+
+  const contextValue: ToastContextType = {
+    showToast,
+    success,
+    error,
+    info,
+    warning,
   };
 
-  const removeToast = (id: number) => {
-    setToasts(prevToasts => prevToasts.filter(toast => toast.id !== id));
-  };
-  
-  const value: FullToastContextType = { toasts, showToast, removeToast };
-
-  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
+  return (
+    <ToastContext.Provider value={contextValue}>
+      {children}
+      
+      {/* Toast Container */}
+      <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full">
+        {toasts.map(toast => (
+          <Toast 
+            key={toast.id} 
+            toast={toast} 
+            onRemove={removeToast} 
+          />
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
 };
 
 export const useToast = (): ToastContextType => {
@@ -39,11 +122,5 @@ export const useToast = (): ToastContextType => {
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
   }
-  // Expose only the public method to consumers of the hook, matching the ToastContextType interface.
-  return { showToast: context.showToast };
+  return context;
 };
-
-// We expose the raw context for direct consumption by the ToastContainer
-export const useInternalToast = (): FullToastContextType | undefined => {
-    return useContext(ToastContext);
-}

@@ -1,7 +1,6 @@
-import React from 'react';
 import { Stethoscope } from 'lucide-react';
 
-const PageLoader: React.FC = () => {
+const PageLoader = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
       <div className="relative flex items-center justify-center">

@@ -1,95 +1,105 @@
 
-import React, { useEffect, useState } from 'react';
-import { useInternalToast } from '../../contexts/ToastContext';
-import { ToastMessage } from '../../types';
-import { CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ToastMessage } from '../../contexts/ToastContext';
+import { CheckCircle, AlertTriangle, Info, XCircle, X } from 'lucide-react';
 
 const ToastIcons = {
-  success: <CheckCircle className="w-6 h-6 text-green-500" />,
-  error: <AlertTriangle className="w-6 h-6 text-red-500" />,
-  info: <Info className="w-6 h-6 text-blue-500" />,
+  success: <CheckCircle className="w-5 h-5 text-green-500" />,
+  error: <XCircle className="w-5 h-5 text-red-500" />,
+  info: <Info className="w-5 h-5 text-blue-500" />,
+  warning: <AlertTriangle className="w-5 h-5 text-amber-500" />,
 };
 
-const ToastMessageComponent: React.FC<{ toast: ToastMessage, onRemove: (id: number) => void }> = ({ toast, onRemove }) => {
-    const [isExiting, setIsExiting] = useState(false);
+const ToastColors = {
+  success: 'border-green-200 bg-green-50',
+  error: 'border-red-200 bg-red-50',
+  info: 'border-blue-200 bg-blue-50',
+  warning: 'border-amber-200 bg-amber-50',
+};
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsExiting(true);
-            setTimeout(() => onRemove(toast.id), 300); // Allow time for exit animation
-        }, 4700);
+interface ToastProps {
+  toast: ToastMessage;
+  onRemove: (id: string) => void;
+}
 
-        return () => clearTimeout(timer);
-    }, [toast.id, onRemove]);
+const Toast = ({ toast, onRemove }: ToastProps) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+
+  useEffect(() => {
+    // Trigger entrance animation
+    const enterTimer = setTimeout(() => setIsVisible(true), 10);
     
-    const handleRemove = () => {
-        setIsExiting(true);
-        setTimeout(() => onRemove(toast.id), 300);
+    // Auto-remove if not persistent
+    let exitTimer: NodeJS.Timeout;
+    if (!toast.persistent && toast.duration) {
+      exitTimer = setTimeout(() => {
+        handleRemove();
+      }, toast.duration);
     }
 
-    return (
-        <div className={`
-            flex items-start p-4 w-full max-w-sm bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden
-            transition-all duration-300 ease-in-out
-            ${isExiting ? 'animate-toast-exit' : 'animate-toast-enter'}
-        `}>
-            <div className="flex-shrink-0">{ToastIcons[toast.type]}</div>
-            <div className="ml-3 w-0 flex-1 pt-0.5">
-                <p className="text-sm font-medium text-slate-900">{toast.message}</p>
-            </div>
-            <div className="ml-4 flex-shrink-0 flex">
-                <button onClick={handleRemove} className="bg-white rounded-md inline-flex text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <span className="sr-only">Close</span>
-                    <X className="h-5 w-5" />
-                </button>
-            </div>
-        </div>
-    );
-};
+    return () => {
+      clearTimeout(enterTimer);
+      if (exitTimer) clearTimeout(exitTimer);
+    };
+  }, [toast.duration, toast.persistent]);
+  
+  const handleRemove = () => {
+    setIsExiting(true);
+    setTimeout(() => onRemove(toast.id), 300);
+  };
 
-
-const ToastContainer: React.FC = () => {
-  const context = useInternalToast();
-
-  if (!context) return null;
-
-  const { toasts, removeToast } = context;
+  const handleActionClick = () => {
+    if (toast.action?.onClick) {
+      toast.action.onClick();
+    }
+    handleRemove();
+  };
 
   return (
-    <>
-      <div aria-live="assertive" className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-end sm:justify-end z-[100]">
-        <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
-          {toasts.map(toast => (
-            <ToastMessageComponent key={toast.id} toast={toast} onRemove={removeToast} />
-          ))}
-        </div>
+    <div 
+      className={`
+        flex items-start p-4 w-full max-w-sm shadow-lg rounded-lg pointer-events-auto border
+        transition-all duration-300 ease-in-out
+        ${ToastColors[toast.type]}
+        ${isVisible && !isExiting 
+          ? 'opacity-100 transform translate-x-0' 
+          : 'opacity-0 transform translate-x-full'
+        }
+      `}
+    >
+      <div className="flex-shrink-0">
+        {ToastIcons[toast.type]}
       </div>
-       <style>{`
-            @keyframes toast-enter {
-                from {
-                    opacity: 0;
-                    transform: translateX(100%);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-            @keyframes toast-exit {
-                from {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateX(100%);
-                }
-            }
-            .animate-toast-enter { animation: toast-enter 0.3s ease-out forwards; }
-            .animate-toast-exit { animation: toast-exit 0.3s ease-in forwards; }
-        `}</style>
-    </>
+      
+      <div className="ml-3 w-0 flex-1">
+        <p className="text-sm font-medium text-gray-900">
+          {toast.message}
+        </p>
+        
+        {toast.action && (
+          <div className="mt-2">
+            <button
+              onClick={handleActionClick}
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline"
+            >
+              {toast.action.label}
+            </button>
+          </div>
+        )}
+      </div>
+      
+      <div className="ml-4 flex-shrink-0 flex">
+        <button 
+          onClick={handleRemove} 
+          className="inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-md"
+        >
+          <span className="sr-only">Fechar</span>
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
   );
 };
 
-export default ToastContainer;
+export default Toast;

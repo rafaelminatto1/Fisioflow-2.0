@@ -1,5 +1,4 @@
 // tests/pages/PatientListPage.test.tsx
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';

@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Frown, Meh, Smile } from 'lucide-react';
 
 interface PainScaleProps {
@@ -7,7 +6,7 @@ interface PainScaleProps {
   onSelectScore: (score: number) => void;
 }
 
-const PainScale: React.FC<PainScaleProps> = ({ selectedScore, onSelectScore }) => {
+const PainScale = ({ selectedScore, onSelectScore }: PainScaleProps) => {
   
   const getPainInfo = (score: number) => {
     if (score >= 0 && score <= 3) return { color: 'text-green-600', bgColor: 'bg-green-100', hoverBg: 'hover:bg-green-200', icon: <Smile className="w-5 h-5" /> };

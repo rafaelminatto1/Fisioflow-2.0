@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Group, Therapist } from '../types';
 import { Edit, Users, Clock, Activity } from 'lucide-react';
 
@@ -9,7 +8,7 @@ interface GroupCardProps {
     onEdit: () => void;
 }
 
-const GroupCard: React.FC<GroupCardProps> = ({ group, therapist, onEdit }) => {
+const GroupCard = ({ group, therapist, onEdit }: GroupCardProps) => {
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col group">
             <div className="p-5 flex-grow">

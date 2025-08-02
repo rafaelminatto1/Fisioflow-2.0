@@ -1,5 +1,4 @@
 // components/TaskCard.tsx
-import React from 'react';
 import { Task, Therapist, TaskPriority } from '../types';
 import { Calendar, ChevronsUp, ChevronUp, ChevronsDown } from 'lucide-react';
 
@@ -15,7 +14,7 @@ const priorityInfo = {
     [TaskPriority.Low]: { icon: <ChevronsDown className="w-4 h-4 text-sky-500" />, color: 'bg-sky-100 border-sky-300' },
 };
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, therapist, onClick }) => {
+const TaskCard = ({ task, therapist, onClick }: TaskCardProps) => {
     const { icon, color } = priorityInfo[task.priority];
     const dueDate = new Date(task.dueDate);
     const isOverdue = dueDate < new Date() && task.status !== 'Concluído';

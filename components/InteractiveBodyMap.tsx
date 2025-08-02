@@ -1,12 +1,11 @@
 
-import React from 'react';
 
 interface InteractiveBodyMapProps {
     selectedParts: string[];
     onSelectPart: (part: string) => void;
 }
 
-const BodyPart: React.FC<{ id: string; d: string; selected: boolean; onClick: (id: string) => void; }> = ({ id, d, selected, onClick }) => (
+const BodyPart = ({ id, d, selected, onClick }: { id: string; d: string; selected: boolean; onClick: (id: string) => void; }) => (
     <path
         id={id}
         d={d}
@@ -19,7 +18,7 @@ const BodyPart: React.FC<{ id: string; d: string; selected: boolean; onClick: (i
     />
 );
 
-const InteractiveBodyMap: React.FC<InteractiveBodyMapProps> = ({ selectedParts, onSelectPart }) => {
+const InteractiveBodyMap = ({ selectedParts, onSelectPart }: InteractiveBodyMapProps) => {
     
     // Simplified SVG path data for body parts
     const parts = {

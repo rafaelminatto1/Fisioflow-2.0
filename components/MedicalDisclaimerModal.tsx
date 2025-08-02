@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 
 interface MedicalDisclaimerModalProps {
@@ -7,7 +6,7 @@ interface MedicalDisclaimerModalProps {
   onAgree: () => void;
 }
 
-const MedicalDisclaimerModal: React.FC<MedicalDisclaimerModalProps> = ({ isOpen, onAgree }) => {
+const MedicalDisclaimerModal = ({ isOpen, onAgree }: MedicalDisclaimerModalProps) => {
   if (!isOpen) return null;
 
   return (

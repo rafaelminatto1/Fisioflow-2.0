@@ -1,6 +1,6 @@
 
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { Patient } from '../types';

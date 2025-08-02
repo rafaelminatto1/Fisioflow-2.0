@@ -1,5 +1,4 @@
 // components/ClinicalHistoryTimeline.tsx
-import React from 'react';
 import { SoapNote } from '../types';
 import { FileText } from 'lucide-react';
 
@@ -8,7 +7,7 @@ interface ClinicalHistoryTimelineProps {
     onViewNote: (note: SoapNote) => void;
 }
 
-const ClinicalHistoryTimeline: React.FC<ClinicalHistoryTimelineProps> = ({ notes, onViewNote }) => {
+const ClinicalHistoryTimeline = ({ notes, onViewNote }: ClinicalHistoryTimelineProps) => {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm">
             <div className="relative border-l-2 border-slate-200 ml-3">

@@ -1,5 +1,4 @@
 // components/AppointmentTimeline.tsx
-import React from 'react';
 import { Appointment, AppointmentStatus } from '../types';
 import { CalendarDays, Plus, CheckCircle, Clock, XCircle, Ban } from 'lucide-react';
 
@@ -25,7 +24,7 @@ const getStatusInfo = (status: AppointmentStatus, isPast: boolean) => {
     }
 };
 
-const AppointmentTimeline: React.FC<AppointmentTimelineProps> = ({ appointments, onAdd }) => {
+const AppointmentTimeline = ({ appointments, onAdd }: AppointmentTimelineProps) => {
     const sortedAppointments = [...appointments].sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
     const now = new Date();
 

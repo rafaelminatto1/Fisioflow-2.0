@@ -1,4 +1,3 @@
-import React from 'react';
 import { Exercise } from '../types';
 import { Edit } from 'lucide-react';
 
@@ -15,7 +14,7 @@ const difficultyColors: Record<number, string> = {
     5: 'bg-red-100 text-red-800',
 };
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onEdit }) => {
+const ExerciseCard = ({ exercise, onEdit }: ExerciseCardProps) => {
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden group">
             <div className="relative">
