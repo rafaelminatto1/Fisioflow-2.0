@@ -2,11 +2,21 @@
 import { GoogleGenAI } from "@google/genai";
 import { ClinicalMaterialData } from "../types";
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY is not set in environment variables.");
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY;
+
+if (!API_KEY) {
+  console.warn("Gemini API key is missing. AI features will be limited. Please set VITE_GEMINI_API_KEY environment variable.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = API_KEY && API_KEY !== 'dummy-key-for-development' 
+  ? new GoogleGenAI({ apiKey: API_KEY })
+  : {
+      models: {
+        generateContent: async () => ({
+          text: 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
+        })
+      }
+    } as any;
 
 const PROMPT_TEMPLATE = `
 # Persona
