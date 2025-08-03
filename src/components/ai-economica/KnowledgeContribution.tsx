@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Save, X, Tag, FileText, Lightbulb, Stethoscope, Target } from 'lucide-react';
 import { KnowledgeEntry } from '../../types/ai-economica.types';
 import KnowledgeBaseService from '../../services/ai-economica/knowledgeBaseService';
-import { useToast } from '../../contexts/ToastContext';
+import { useToast } from '../../../contexts/ToastContext';
 
 interface KnowledgeContributionProps {
   onClose?: () => void;

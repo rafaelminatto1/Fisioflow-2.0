@@ -60,13 +60,11 @@ class AiOrchestratorService {
     } else {
       // Mock para desenvolvimento sem API key
       this.ai = {
-        getGenerativeModel: () => ({
+        models: {
           generateContent: async () => ({
-            response: {
-              text: () => 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
-            }
+            text: 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
           })
-        })
+        }
       } as any;
     }
   }
@@ -121,11 +119,13 @@ class AiOrchestratorService {
                 return fallbackResponse;
             }
 
-            const model = this.ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
-            const result = await model.generateContent(schedulingPrompt);
+            const result = await this.ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: schedulingPrompt,
+            });
 
             const response: AIResponse = {
-                content: result.response.text(),
+                content: result.text,
                 source: provider,
             };
             this.logQuery(prompt, response);
@@ -179,14 +179,13 @@ class AiOrchestratorService {
             return fallbackResponse;
         }
 
-        const model = this.ai.getGenerativeModel({ 
-            model: 'gemini-1.5-flash',
-            systemInstruction: 'You are a helpful clinical assistant for a physiotherapist in Brazil named FisioFlow AI. Provide concise, accurate information compliant with LGPD and COFFITO regulations. Always remind the user that your suggestions do not replace professional clinical judgment. Respond in Brazilian Portuguese.'
+        const result = await this.ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
         });
-        const result = await model.generateContent(prompt);
 
         const response: AIResponse = {
-            content: result.response.text(),
+            content: result.text,
             source: provider
         };
         this.logQuery(prompt, response);
