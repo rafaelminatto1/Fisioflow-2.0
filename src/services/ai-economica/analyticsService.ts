@@ -3,6 +3,7 @@ import {
   PremiumProvider, 
   QueryType, 
   ResponseSource, 
+  ResponseSourceType,
   Alert,
   AIQuery,
   AIResponse
@@ -14,7 +15,7 @@ interface QueryMetrics {
   id: string;
   queryId: string;
   type: QueryType;
-  source: ResponseSource;
+  source: ResponseSourceType;
   provider?: PremiumProvider;
   responseTime: number;
   tokensUsed: number;
@@ -105,7 +106,7 @@ export class AnalyticsService {
         id: this.generateMetricId(),
         queryId: query.id,
         type: query.type,
-        source: ResponseSource.INTERNAL, // Default para falhas
+        source: 'internal' as ResponseSourceType, // Default para falhas
         responseTime,
         tokensUsed: 0,
         confidence: 0,

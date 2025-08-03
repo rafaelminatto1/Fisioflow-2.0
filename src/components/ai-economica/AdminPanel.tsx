@@ -34,7 +34,13 @@ const AdminPanel = ({ className = '' }: AdminPanelProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [serviceStats, setServiceStats] = useState<any>(null);
-  const [providerTests, setProviderTests] = useState<Record<PremiumProvider, boolean>>({});
+  const [providerTests, setProviderTests] = useState<Record<PremiumProvider, boolean>>({
+    [PremiumProvider.CHATGPT_PLUS]: false,
+    [PremiumProvider.GEMINI_PRO]: false,
+    [PremiumProvider.CLAUDE_PRO]: false,
+    [PremiumProvider.PERPLEXITY_PRO]: false,
+    [PremiumProvider.MARS_AI_PRO]: false
+  });
   const [alerts, setAlerts] = useState<AlertType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);

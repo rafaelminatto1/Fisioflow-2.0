@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Save, X, Tag, FileText, Lightbulb, Stethoscope, Target } from 'lucide-react';
 import { KnowledgeEntry } from '../../types/ai-economica.types';
 import KnowledgeBaseService from '../../services/ai-economica/knowledgeBaseService';
-import { useToast } from '../../contexts/ToastContext';
+import { useToast } from '../../../contexts/ToastContext';
 
 interface KnowledgeContributionProps {
   onClose?: () => void;
@@ -15,20 +15,20 @@ const KnowledgeContribution = ({
   onSaved, 
   initialData 
 }: KnowledgeContributionProps) => {
-  const [formData, setFormData] = useState({
-    type: 'experience' as KnowledgeEntry['type'],
+  const [formData, setFormData] = useState<Partial<KnowledgeEntry>>({
+    type: 'experience',
     title: '',
     content: '',
     summary: '',
-    tags: [] as string[],
-    conditions: [] as string[],
-    techniques: [] as string[],
-    contraindications: [] as string[],
-    references: [] as string[],
+    tags: [],
+    conditions: [],
+    techniques: [],
+    contraindications: [],
+    references: [],
     metadata: {
-      difficulty: 'intermediate' as const,
-      evidenceLevel: 'moderate' as const,
-      specialty: [] as string[]
+      difficulty: 'intermediate',
+      evidenceLevel: 'moderate',
+      specialty: []
     }
   });
 
@@ -108,10 +108,22 @@ const KnowledgeContribution = ({
       };
 
       const entryData = {
-        ...formData,
+        type: formData.type!,
+        title: formData.title!,
+        content: formData.content!,
+        summary: formData.summary || formData.content!.substring(0, 200) + '...',
+        tags: formData.tags || [],
+        conditions: formData.conditions || [],
+        techniques: formData.techniques || [],
+        contraindications: formData.contraindications || [],
+        references: formData.references || [],
+        metadata: formData.metadata!,
         tenantId: 'tenant_fisioflow',
         author: currentUser,
-        summary: formData.summary || formData.content.substring(0, 200) + '...'
+        confidence: 0.5,
+        usageCount: 0,
+        successRate: 0,
+        lastUsed: new Date().toISOString()
       };
 
       const entryId = await knowledgeBase.addKnowledge(entryData);

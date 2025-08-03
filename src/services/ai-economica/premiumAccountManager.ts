@@ -6,7 +6,8 @@ import {
   AIQuery, 
   AIResponse, 
   QueryType,
-  Alert
+  Alert,
+  ResponseSourceType
 } from '../../types/ai-economica.types';
 import aiEconomicaConfig, { ENHANCED_PROVIDER_STRATEGY } from '../../config/ai-economica.config';
 import aiLogger, { LogCategory } from './logger';
@@ -35,7 +36,7 @@ class ChatGPTPlusClient implements ProviderClient {
         queryId: query.id,
         content: response.message,
         confidence: 0.85,
-        source: 'premium',
+        source: 'premium' as ResponseSourceType,
         provider: PremiumProvider.CHATGPT_PLUS,
         references: [],
         suggestions: response.suggestions || [],
@@ -114,7 +115,7 @@ class GeminiProClient implements ProviderClient {
         queryId: query.id,
         content: response.candidates[0].content.parts[0].text,
         confidence: 0.88,
-        source: 'premium',
+        source: 'premium' as ResponseSourceType,
         provider: PremiumProvider.GEMINI_PRO,
         references: [],
         suggestions: [],
@@ -213,7 +214,7 @@ class ClaudeProClient implements ProviderClient {
         queryId: query.id,
         content: response.message,
         confidence: 0.90,
-        source: 'premium',
+        source: 'premium' as ResponseSourceType,
         provider: PremiumProvider.CLAUDE_PRO,
         references: response.references || [],
         suggestions: response.suggestions || [],
@@ -279,7 +280,7 @@ class PerplexityProClient implements ProviderClient {
         queryId: query.id,
         content: response.answer,
         confidence: 0.82,
-        source: 'premium',
+        source: 'premium' as ResponseSourceType,
         provider: PremiumProvider.PERPLEXITY_PRO,
         references: response.sources || [],
         suggestions: [],
@@ -368,7 +369,11 @@ export class PremiumAccountManager {
       const tracker: UsageTracker = {
         provider,
         current: { monthly: 0, daily: 0, hourly: 0 },
-        limits: config.limits,
+        limits: { 
+          monthly: config.limits.monthly, 
+          daily: config.limits.daily, 
+          hourly: config.limits.hourly 
+        },
         status: UsageStatus.AVAILABLE,
         percentage: 0,
         resetDates: {
@@ -482,7 +487,7 @@ export class PremiumAccountManager {
     tracker.current.monthly += tokensUsed;
 
     // Calcular percentual baseado no limite mais restritivo
-    const hourlyPercent = tracker.current.hourly / tracker.limits.perHour;
+    const hourlyPercent = tracker.current.hourly / tracker.limits.hourly;
     const dailyPercent = tracker.current.daily / tracker.limits.daily;
     const monthlyPercent = tracker.current.monthly / tracker.limits.monthly;
     
@@ -747,7 +752,7 @@ export class PremiumAccountManager {
   }
 
   private recalculateStatus(tracker: UsageTracker): void {
-    const hourlyPercent = tracker.current.hourly / tracker.limits.perHour;
+    const hourlyPercent = tracker.current.hourly / tracker.limits.hourly;
     const dailyPercent = tracker.current.daily / tracker.limits.daily;
     const monthlyPercent = tracker.current.monthly / tracker.limits.monthly;
     

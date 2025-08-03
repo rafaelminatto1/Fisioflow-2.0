@@ -24,6 +24,8 @@ export enum ResponseSource {
   PREMIUM = 'premium'
 }
 
+export type ResponseSourceType = 'internal' | 'cache' | 'premium';
+
 export enum UsageStatus {
   AVAILABLE = 'available',
   WARNING = 'warning',
@@ -87,7 +89,7 @@ export interface AIResponse {
   queryId: string;
   content: string;
   confidence: number;
-  source: ResponseSource;
+  source: ResponseSourceType;
   provider?: PremiumProvider;
   references: Reference[];
   suggestions: string[];
@@ -144,7 +146,7 @@ export interface ProviderConfig {
   limits: {
     monthly: number;
     daily: number;
-    perHour: number;
+    hourly: number;
   };
   preferences: {
     queryTypes: QueryType[];
@@ -213,7 +215,7 @@ export interface ErrorContext {
   queryId: string;
   query: AIQuery;
   provider?: PremiumProvider;
-  source: ResponseSource;
+  source: ResponseSourceType;
   userAgent: string;
   sessionId: string;
   timestamp: string;
@@ -281,26 +283,26 @@ export const DEFAULT_LIMITS = {
   [PremiumProvider.CHATGPT_PLUS]: {
     monthly: 2000,
     daily: 100,
-    perHour: 10
+    hourly: 10
   },
   [PremiumProvider.GEMINI_PRO]: {
     monthly: 3000,
     daily: 150,
-    perHour: 15
+    hourly: 15
   },
   [PremiumProvider.CLAUDE_PRO]: {
     monthly: 2500,
     daily: 125,
-    perHour: 12
+    hourly: 12
   },
   [PremiumProvider.PERPLEXITY_PRO]: {
     monthly: 1000,
     daily: 50,
-    perHour: 5
+    hourly: 5
   },
   [PremiumProvider.MARS_AI_PRO]: {
     monthly: 1500,
     daily: 75,
-    perHour: 8
+    hourly: 8
   }
 };

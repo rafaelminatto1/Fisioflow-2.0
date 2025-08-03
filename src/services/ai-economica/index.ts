@@ -8,6 +8,13 @@ export { default as CacheService } from './cacheService';
 export { default as PremiumAccountManager } from './premiumAccountManager';
 export { default as AnalyticsService } from './analyticsService';
 
+// Import das classes para uso interno
+import AIServiceClass from './aiService';
+import KnowledgeBaseServiceClass from './knowledgeBaseService';
+import CacheServiceClass from './cacheService';
+import PremiumAccountManagerClass from './premiumAccountManager';
+import AnalyticsServiceClass from './analyticsService';
+
 // Sistema de logging
 export { default as aiLogger, aiLogger as logger, log, LogCategory, LogLevel } from './logger';
 
@@ -22,19 +29,19 @@ import AIService from './aiService';
 import AnalyticsService from './analyticsService';
 
 // Instâncias globais (singleton pattern)
-let globalAIService: AIService | null = null;
-let globalAnalyticsService: AnalyticsService | null = null;
+let globalAIService: AIServiceClass | null = null;
+let globalAnalyticsService: AnalyticsServiceClass | null = null;
 
-export const getAIService = (): AIService => {
+export const getAIService = (): AIServiceClass => {
   if (!globalAIService) {
-    globalAIService = new AIService();
+    globalAIService = new AIServiceClass();
   }
   return globalAIService;
 };
 
-export const getAnalyticsService = (): AnalyticsService => {
+export const getAnalyticsService = (): AnalyticsServiceClass => {
   if (!globalAnalyticsService) {
-    globalAnalyticsService = new AnalyticsService();
+    globalAnalyticsService = new AnalyticsServiceClass();
   }
   return globalAnalyticsService;
 };
@@ -81,16 +88,14 @@ export const processAIQuery = async (
 
 // Função de conveniência para adicionar conhecimento
 export const addKnowledge = async (knowledgeData: Partial<import('../../types/ai-economica.types').KnowledgeEntry>) => {
-  const { KnowledgeBaseService } = await import('./knowledgeBaseService');
-  const knowledgeBase = new KnowledgeBaseService();
+  const knowledgeBase = new KnowledgeBaseServiceClass();
   
   return await knowledgeBase.addKnowledge(knowledgeData as any);
 };
 
 // Função de conveniência para buscar conhecimento
 export const searchKnowledge = async (searchParams: import('../../types/ai-economica.types').SearchParams) => {
-  const { KnowledgeBaseService } = await import('./knowledgeBaseService');
-  const knowledgeBase = new KnowledgeBaseService();
+  const knowledgeBase = new KnowledgeBaseServiceClass();
   
   return await knowledgeBase.search(searchParams);
 };
@@ -213,11 +218,11 @@ export const initializeAIEconomica = async (config?: Partial<typeof import('../.
 // Default export
 export default {
   // Serviços
-  AIService,
-  KnowledgeBaseService,
-  CacheService,
-  PremiumAccountManager,
-  AnalyticsService,
+  AIService: AIServiceClass,
+  KnowledgeBaseService: KnowledgeBaseServiceClass,
+  CacheService: CacheServiceClass,
+  PremiumAccountManager: PremiumAccountManagerClass,
+  AnalyticsService: AnalyticsServiceClass,
   
   // Funções de conveniência
   processAIQuery,

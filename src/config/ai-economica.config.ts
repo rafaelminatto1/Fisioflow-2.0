@@ -47,6 +47,11 @@ export const AI_ECONOMICA_CONFIG = {
     [PremiumProvider.CHATGPT_PLUS]: {
       enabled: true,
       endpoint: 'https://chat.openai.com/backend-api/conversation',
+      credentials: {
+        apiKey: '',
+        sessionToken: '',
+        refreshToken: ''
+      },
       limits: DEFAULT_LIMITS[PremiumProvider.CHATGPT_PLUS],
       preferences: {
         queryTypes: [
@@ -55,14 +60,17 @@ export const AI_ECONOMICA_CONFIG = {
           QueryType.CASE_ANALYSIS
         ],
         priority: 1
-      },
-      timeout: 25000,
-      retryAttempts: 2
+      }
     } as ProviderConfig,
 
     [PremiumProvider.GEMINI_PRO]: {
       enabled: true,
       endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+      credentials: {
+        apiKey: '',
+        sessionToken: '',
+        refreshToken: ''
+      },
       limits: DEFAULT_LIMITS[PremiumProvider.GEMINI_PRO],
       preferences: {
         queryTypes: [
@@ -71,14 +79,17 @@ export const AI_ECONOMICA_CONFIG = {
           QueryType.DOCUMENT_ANALYSIS
         ],
         priority: 2
-      },
-      timeout: 30000,
-      retryAttempts: 3
+      }
     } as ProviderConfig,
 
     [PremiumProvider.CLAUDE_PRO]: {
       enabled: true,
       endpoint: 'https://claude.ai/api/conversation',
+      credentials: {
+        apiKey: '',
+        sessionToken: '',
+        refreshToken: ''
+      },
       limits: DEFAULT_LIMITS[PremiumProvider.CLAUDE_PRO],
       preferences: {
         queryTypes: [
@@ -87,33 +98,37 @@ export const AI_ECONOMICA_CONFIG = {
           QueryType.DIAGNOSIS_HELP
         ],
         priority: 1
-      },
-      timeout: 35000,
-      retryAttempts: 2
+      }
     } as ProviderConfig,
 
     [PremiumProvider.PERPLEXITY_PRO]: {
       enabled: true,
       endpoint: 'https://www.perplexity.ai/api/conversation',
+      credentials: {
+        apiKey: '',
+        sessionToken: '',
+        refreshToken: ''
+      },
       limits: DEFAULT_LIMITS[PremiumProvider.PERPLEXITY_PRO],
       preferences: {
         queryTypes: [QueryType.RESEARCH_QUERY],
         priority: 1
-      },
-      timeout: 40000,
-      retryAttempts: 1
+      }
     } as ProviderConfig,
 
     [PremiumProvider.MARS_AI_PRO]: {
       enabled: false, // Desabilitado por padrão até configuração
       endpoint: 'https://mars.ai/api/chat',
+      credentials: {
+        apiKey: '',
+        sessionToken: '',
+        refreshToken: ''
+      },
       limits: DEFAULT_LIMITS[PremiumProvider.MARS_AI_PRO],
       preferences: {
         queryTypes: [QueryType.GENERAL_QUESTION],
         priority: 3
-      },
-      timeout: 20000,
-      retryAttempts: 1
+      }
     } as ProviderConfig
   },
 
