@@ -12,6 +12,19 @@
   ],
   "headers": [
     {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
         {
@@ -66,7 +79,8 @@
   "env": {
     "NODE_ENV": "production",
     "VITE_APP_NAME": "FisioFlow",
-    "VITE_APP_VERSION": "2.0.0"
+    "VITE_APP_VERSION": "2.0.0",
+    "VITE_GEMINI_API_KEY": "@gemini-api-key"
   },
   "regions": ["gru1"],
   "github": {

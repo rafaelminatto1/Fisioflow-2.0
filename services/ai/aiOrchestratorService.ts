@@ -4,8 +4,10 @@ import { AIProvider, AIResponse, AIQueryLog } from '../../types';
 import { cacheService } from './cacheService';
 import { knowledgeService } from './knowledgeService';
 
-if (!process.env.API_KEY) {
-  console.error("Gemini API key is missing. Please set the API_KEY environment variable.");
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY;
+
+if (!API_KEY) {
+  console.warn("Gemini API key is missing. AI features will be limited. Please set VITE_GEMINI_API_KEY environment variable.");
 }
 
 const PROMPT_TEMPLATE_SCHEDULING = `
@@ -53,7 +55,20 @@ class AiOrchestratorService {
   private currentProviderIndex = 0;
   
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+    if (API_KEY && API_KEY !== 'dummy-key-for-development') {
+      this.ai = new GoogleGenAI({ apiKey: API_KEY });
+    } else {
+      // Mock para desenvolvimento sem API key
+      this.ai = {
+        getGenerativeModel: () => ({
+          generateContent: async () => ({
+            response: {
+              text: () => 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
+            }
+          })
+        })
+      } as any;
+    }
   }
 
   private logQuery(prompt: string, response: AIResponse) {
@@ -97,13 +112,20 @@ class AiOrchestratorService {
         const schedulingPrompt = PROMPT_TEMPLATE_SCHEDULING.replace('{{chat_history}}', formattedHistory);
 
         try {
-            const result = await this.ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: schedulingPrompt,
-            });
+            if (!this.ai || !API_KEY || API_KEY === 'dummy-key-for-development') {
+                const fallbackResponse: AIResponse = {
+                    content: "Olá! Sou o Rafa, assistente virtual da FisioFlow. Para agendar uma consulta, por favor entre em contato conosco pelo telefone ou WhatsApp. No momento, estou com acesso limitado à agenda.",
+                    source: provider
+                };
+                this.logQuery(prompt, fallbackResponse);
+                return fallbackResponse;
+            }
+
+            const model = this.ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+            const result = await model.generateContent(schedulingPrompt);
 
             const response: AIResponse = {
-                content: result.text,
+                content: result.response.text(),
                 source: provider,
             };
             this.logQuery(prompt, response);
@@ -148,16 +170,23 @@ class AiOrchestratorService {
     this.currentProviderIndex = (this.currentProviderIndex + 1) % this.providerRotation.length;
 
     try {
-        const result = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                systemInstruction: 'You are a helpful clinical assistant for a physiotherapist in Brazil named FisioFlow AI. Provide concise, accurate information compliant with LGPD and COFFITO regulations. Always remind the user that your suggestions do not replace professional clinical judgment. Respond in Brazilian Portuguese.'
-            }
+        if (!this.ai || !API_KEY || API_KEY === 'dummy-key-for-development') {
+            const fallbackResponse: AIResponse = {
+                content: "Desculpe, o recurso de IA não está disponível no momento. Configure a API key do Gemini para usar esta funcionalidade.",
+                source: provider
+            };
+            this.logQuery(prompt, fallbackResponse);
+            return fallbackResponse;
+        }
+
+        const model = this.ai.getGenerativeModel({ 
+            model: 'gemini-1.5-flash',
+            systemInstruction: 'You are a helpful clinical assistant for a physiotherapist in Brazil named FisioFlow AI. Provide concise, accurate information compliant with LGPD and COFFITO regulations. Always remind the user that your suggestions do not replace professional clinical judgment. Respond in Brazilian Portuguese.'
         });
+        const result = await model.generateContent(prompt);
 
         const response: AIResponse = {
-            content: result.text,
+            content: result.response.text(),
             source: provider
         };
         this.logQuery(prompt, response);
