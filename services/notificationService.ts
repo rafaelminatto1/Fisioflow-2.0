@@ -1,47 +1,72 @@
-// services/notificationService.ts
-import { Notification, Role } from '../types';
-import { mockNotifications, mockUsers } from '../data/mockData';
 
-const notifications: Notification[] = [...mockNotifications];
+import { supabase } from './supabase/supabaseClient';
+import { Notification } from '../types';
 
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+class NotificationService {
+  async getNotifications(userId: string): Promise<Notification[]> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
 
-export const getNotifications = async (userId: string): Promise<Notification[]> => {
-    await delay(300);
-    return [...notifications]
-        .filter(n => n.userId === userId)
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-};
-
-export const markAsRead = async (notificationId: string, userId: string): Promise<Notification | undefined> => {
-    await delay(100);
-    const notification = notifications.find(n => n.id === notificationId && n.userId === userId);
-    if (notification) {
-        notification.isRead = true;
+    if (error) {
+      throw new Error(`Erro ao buscar notificações: ${error.message}`);
     }
-    return notification;
-};
 
-export const markAllAsRead = async (userId: string): Promise<Notification[]> => {
-    await delay(200);
-    const userNotifications = notifications.filter(n => n.userId === userId);
-    userNotifications.forEach(n => n.isRead = true);
-    return userNotifications;
-};
+    return data || [];
+  }
 
-export const sendBroadcast = async (message: string, targetGroup: Role): Promise<void> => {
-    await delay(500);
-    const targetUsers = mockUsers.filter(u => u.role === targetGroup);
-    
-    targetUsers.forEach(user => {
-        const newNotification: Notification = {
-            id: `notif_${Date.now()}_${user.id}`,
-            userId: user.id,
-            message: `Comunicado: ${message}`,
-            isRead: false,
-            createdAt: new Date(),
-            type: 'announcement',
-        };
-        notifications.unshift(newNotification);
-    });
-};
+  async markAsRead(notificationId: string): Promise<void> {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', notificationId);
+
+    if (error) {
+      throw new Error(`Erro ao marcar notificação como lida: ${error.message}`);
+    }
+  }
+
+  async markAllAsRead(userId: string): Promise<void> {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('is_read', false);
+
+    if (error) {
+      throw new Error(`Erro ao marcar todas as notificações como lidas: ${error.message}`);
+    }
+  }
+
+  async sendNotification(userId: string, message: string, type: string): Promise<void> {
+    const { error } = await supabase.from('notifications').insert([
+      {
+        user_id: userId,
+        message,
+        type,
+      },
+    ]);
+
+    if (error) {
+      throw new Error(`Erro ao enviar notificação: ${error.message}`);
+    }
+  }
+
+  async sendBroadcast(message: string, type: string, userIds: string[]): Promise<void> {
+    const notifications = userIds.map(userId => ({
+      user_id: userId,
+      message,
+      type,
+    }));
+
+    const { error } = await supabase.from('notifications').insert(notifications);
+
+    if (error) {
+      throw new Error(`Erro ao enviar notificação em massa: ${error.message}`);
+    }
+  }
+}
+
+export const notificationService = new NotificationService();

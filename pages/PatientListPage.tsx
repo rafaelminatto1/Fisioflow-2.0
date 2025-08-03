@@ -1,5 +1,3 @@
-
-
 import { useState, useMemo, useContext } from 'react';
 import { Plus, Search, Filter, BarChart3, Download, Users } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
@@ -8,11 +6,11 @@ import * as ReactRouterDOM from 'react-router-dom';
 import PatientFormModal from '../components/PatientFormModal';
 import Skeleton from '../components/ui/Skeleton';
 import { usePatients } from '../hooks/usePatients';
-import { AdvancedSearchPanel } from '../components/patient/AdvancedSearchPanel';
+import AdvancedSearchPanel from '../components/patient/AdvancedSearchPanel';
 import { AuthContext } from '../contexts/AuthContext';
+import { AutoSizer, List } from 'react-virtualized';
 
-
-const PatientRow: React.FC<{ patient: Patient; showConditions?: boolean }> = ({ patient, showConditions = false }) => {
+const PatientRow: React.FC<{ patient: Patient; style: React.CSSProperties; showConditions?: boolean }> = ({ patient, style, showConditions = false }) => {
   const navigate = ReactRouterDOM.useNavigate();
   const statusColorMap = {
     'Ativo': 'bg-green-100 text-green-800',
@@ -27,7 +25,8 @@ const PatientRow: React.FC<{ patient: Patient; showConditions?: boolean }> = ({ 
 
 
   return (
-    <tr 
+    <tr
+        style={style}
         className="border-b border-slate-200 hover:bg-slate-50 cursor-pointer"
         onClick={() => navigate(`/patients/${patient.id}`)}
     >
@@ -75,11 +74,11 @@ const PatientListPage: React.FC = () => {
   const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
-  
+
   // Legacy search states for fallback
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  
+
   const { patients, isLoading, error, addPatient } = usePatients();
   const { user } = useContext(AuthContext);
   const navigate = ReactRouterDOM.useNavigate();
@@ -89,7 +88,7 @@ const PatientListPage: React.FC = () => {
     if (useAdvancedSearch && searchResults) {
       return searchResults.patients;
     }
-    
+
     // Legacy filtering for backward compatibility
     if (!patients) return [];
     return patients
@@ -108,7 +107,7 @@ const PatientListPage: React.FC = () => {
     }
     return displayedPatients.length;
   }, [useAdvancedSearch, searchResults, displayedPatients]);
-  
+
   const handleSavePatient = async (patientData: Omit<Patient, 'id' | 'lastVisit'>) => {
     await addPatient(patientData);
     setIsModalOpen(false);
@@ -124,9 +123,14 @@ const PatientListPage: React.FC = () => {
     setSearchResults(null);
   };
 
+  const renderRow = ({ index, key, style }: { index: number; key: string; style: React.CSSProperties }) => {
+    const patient = displayedPatients[index];
+    return <PatientRow key={key} patient={patient} style={style} showConditions={useAdvancedSearch} />;
+  };
+
   const renderContent = () => {
     const colSpan = useAdvancedSearch ? 5 : 4;
-    
+
     if (isLoading && !useAdvancedSearch) {
       return Array.from({ length: 5 }).map((_, i) => (
         <tr key={i}>
@@ -147,9 +151,19 @@ const PatientListPage: React.FC = () => {
         return <tr><td colSpan={colSpan} className="text-center p-10 text-slate-500">Nenhum paciente encontrado.</td></tr>;
     }
 
-    return displayedPatients.map((patient) => (
-      <PatientRow key={patient.id} patient={patient} showConditions={useAdvancedSearch} />
-    ));
+    return (
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            width={width}
+            height={height}
+            rowCount={displayedPatients.length}
+            rowHeight={80}
+            rowRenderer={renderRow}
+          />
+        )}
+      </AutoSizer>
+    );
   };
 
   return (
@@ -182,7 +196,7 @@ const PatientListPage: React.FC = () => {
           </button>
 
           {/* Add Patient Button */}
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center justify-center rounded-lg border border-transparent bg-sky-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
           >
@@ -191,8 +205,8 @@ const PatientListPage: React.FC = () => {
           </button>
         </div>
       </PageHeader>
-      
-      <PatientFormModal 
+
+      <PatientFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSavePatient}
@@ -240,9 +254,9 @@ const PatientListPage: React.FC = () => {
       )}
 
       {/* Patient Table */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm">
+      <div className="bg-white p-6 rounded-2xl shadow-sm" style={{ height: '500px' }}>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto h-full">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>

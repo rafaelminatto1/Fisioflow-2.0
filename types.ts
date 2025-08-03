@@ -868,3 +868,20 @@ export interface PatientNotification {
   read?: Date;
   status: 'pending' | 'sent' | 'delivered' | 'failed';
 }
+
+// --- Enhanced Patient Dashboard Types ---
+
+export interface DashboardWidget {
+  id: string;
+  type: 'PainTrend' | 'ExerciseStreak' | 'EducationalContent' | 'Communication' | 'Gamification';
+  position: { x: number; y: number; w: number; h: number };
+}
+
+export interface PatientDashboard {
+  patientId: string;
+  layout: DashboardWidget[];
+  preferences: {
+    theme: 'light' | 'dark';
+    showMotivationalMessages: boolean;
+  };
+}

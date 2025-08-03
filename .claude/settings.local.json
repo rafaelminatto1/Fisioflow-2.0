@@ -29,7 +29,8 @@
       "Bash(npx vercel:*)",
       "Bash(npm remove:*)",
       "WebFetch(domain:fisioflow-20-5ny0xugz5-rafael-minattos-projects.vercel.app)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(npm test)"
     ],
     "deny": []
   }
