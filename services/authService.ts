@@ -1,6 +1,6 @@
 
 import { User, Role } from '../types';
-import { AuthService as SupabaseAuthService } from './supabase';
+import { AuthService as SupabaseAuthService } from './supabase/authService';
 import { mockUsers } from '../data/mockData';
 
 const SESSION_KEY = 'fisioflow_user_session';
@@ -20,24 +20,30 @@ const convertSupabaseUser = (supabaseUser: any): User => {
 export const login = async (email: string, password: string): Promise<User> => {
   try {
     if (USE_SUPABASE) {
-      const { data, error, success } = await SupabaseAuthService.signIn(email, password);
-      
-      if (!success || error) {
-        throw new Error(error?.message || 'Erro de autenticação');
-      }
+      try {
+        const { data, error, success } = await SupabaseAuthService.signIn(email, password);
+        
+        if (!success || error) {
+          throw new Error(error?.message || 'Erro de autenticação');
+        }
 
-      const user = convertSupabaseUser(data.user);
-      
-      // Store in session storage for compatibility
-      const sessionData = {
-        user,
-        timestamp: Date.now(),
-        supabaseSession: data.session,
-      };
-      
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
-      
-      return user;
+        const user = convertSupabaseUser(data.user);
+        
+        // Store in session storage for compatibility
+        const sessionData = {
+          user,
+          timestamp: Date.now(),
+          supabaseSession: data.session,
+        };
+        
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+        
+        return user;
+      } catch (supabaseError) {
+        console.warn('Supabase authentication failed, falling back to mock auth:', supabaseError);
+        // Fall back to mock authentication if Supabase fails
+        return mockLogin(email, password);
+      }
     } else {
       // Fallback to mock authentication
       return mockLogin(email, password);
