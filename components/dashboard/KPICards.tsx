@@ -19,7 +19,7 @@ const KPICards: React.FC<KPICardsProps> = ({ appointments, patients }) => {
             .filter(a => a.startTime >= startOfMonth && a.status === 'Realizado')
             .reduce((sum, a) => sum + a.value, 0);
 
-        const activePatients = patients.filter(p => p.status === 'Active').length;
+        const activePatients = patients.filter(p => p.status === 'Ativo').length;
 
         // Simplified occupancy rate calculation
         const completedThisMonth = appointments.filter(a => a.startTime >= startOfMonth && a.status === 'Realizado').length;

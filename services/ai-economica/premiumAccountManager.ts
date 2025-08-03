@@ -29,10 +29,14 @@ class PremiumAccountManager {
   private ai: GoogleGenAI;
 
   constructor() {
-    if (!process.env.API_KEY) {
-      throw new Error("API_KEY is not set for PremiumAccountManager.");
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey || apiKey === 'your-gemini-api-key-here') {
+      console.warn("VITE_GEMINI_API_KEY is not properly configured. Gemini functionality will be limited.");
+      // Create a mock GoogleGenAI instance for development
+      this.ai = null as any;
+    } else {
+      this.ai = new GoogleGenAI({ apiKey });
     }
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   }
 
   async selectBestProvider(queryType: QueryType): Promise<PremiumProvider | null> {
@@ -114,6 +118,25 @@ class PremiumAccountManager {
   }
 
   private async queryGemini(query: AIQuery): Promise<AIResponse> {
+    // If no API key is configured, return a mock response
+    if (!this.ai) {
+      return {
+        id: `resp_${Date.now()}`,
+        queryId: query.id,
+        content: `Resposta simulada do Gemini para desenvolvimento: "${query.text}". Configure VITE_GEMINI_API_KEY para usar a API real.`,
+        confidence: 0.85,
+        source: ResponseSource.PREMIUM,
+        provider: PremiumProvider.GEMINI_PRO,
+        references: [],
+        suggestions: ["Configure a API key do Gemini", "Verifique o arquivo .env.local"],
+        followUpQuestions: ["Como configurar a API key?", "Onde encontrar a chave do Gemini?"],
+        tokensUsed: 50,
+        responseTime: 0,
+        createdAt: new Date().toISOString(),
+        metadata: { reliability: 0.5, relevance: 0.8 }
+      };
+    }
+
     const result = await this.ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: query.text,
@@ -143,4 +166,31 @@ class PremiumAccountManager {
   }
 }
 
-export const premiumAccountManager = new PremiumAccountManager();
+// Lazy instantiation to avoid errors at module load time
+let _premiumAccountManager: PremiumAccountManager | null = null;
+
+export const premiumAccountManager = {
+  get instance(): PremiumAccountManager {
+    if (!_premiumAccountManager) {
+      _premiumAccountManager = new PremiumAccountManager();
+    }
+    return _premiumAccountManager;
+  },
+  
+  // Proxy methods for backward compatibility
+  async selectBestProvider(queryType: QueryType): Promise<PremiumProvider | null> {
+    return this.instance.selectBestProvider(queryType);
+  },
+  
+  async getAvailableProviders(): Promise<PremiumProvider[]> {
+    return this.instance.getAvailableProviders();
+  },
+  
+  async query(provider: PremiumProvider, query: AIQuery): Promise<AIResponse> {
+    return this.instance.query(provider, query);
+  },
+  
+  async trackUsage(provider: PremiumProvider, tokensUsed: number): Promise<void> {
+    return this.instance.trackUsage(provider, tokensUsed);
+  }
+};

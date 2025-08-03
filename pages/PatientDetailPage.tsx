@@ -245,15 +245,10 @@ const PatientDetailPage: React.FC = () => {
                         <InfoCard title="Condições / Queixas" icon={<Heart />}>
                             <ul className="space-y-3">
                                 {currentPatient.conditions.map((condition, index) => {
-                                    const timeSince = calculateTimeSince(condition.date);
+                                    // conditions are now strings, not objects
                                     return (
                                     <li key={index} className="p-3 bg-slate-50 rounded-lg">
-                                        <p className="font-semibold text-slate-800">{condition.name}</p>
-                                        <div className="text-xs text-slate-500 mt-1">
-                                            <span>Início: {new Date(condition.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
-                                            <span className="mx-1">•</span>
-                                            <span>{timeSince.days} dias</span>
-                                        </div>
+                                        <p className="font-semibold text-slate-800">{condition}</p>
                                     </li>
                                 )})}
                             </ul>
@@ -264,17 +259,10 @@ const PatientDetailPage: React.FC = () => {
                         <InfoCard title="Histórico Cirúrgico" icon={<SurgeryIcon />}>
                             <ul className="space-y-3">
                                 {currentPatient.surgeries.map((surgery, index) => {
-                                    const timeSince = calculateTimeSince(surgery.date);
+                                    // surgeries are now strings, not objects
                                     return (
                                     <li key={index} className="p-3 bg-slate-50 rounded-lg">
                                         <p className="font-semibold text-slate-800">{surgery.name}</p>
-                                        <div className="text-xs text-slate-500 mt-1">
-                                            <span>{new Date(surgery.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
-                                            <span className="mx-1">•</span>
-                                            <span>{timeSince.days} dias</span>
-                                            <span className="mx-1">•</span>
-                                            <span>{timeSince.weeks} semanas</span>
-                                        </div>
                                     </li>
                                 )})}
                             </ul>

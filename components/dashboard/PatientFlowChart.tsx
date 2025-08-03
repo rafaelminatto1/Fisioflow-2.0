@@ -31,7 +31,7 @@ const PatientFlowChart: React.FC<PatientFlowChartProps> = ({ patients }) => {
                     monthMap.get(monthString)!['Novos Pacientes']++;
                 }
             }
-            if (p.status === 'Discharged') {
+            if (p.status === 'Alta') {
                 const lastVisitDate = new Date(p.lastVisit);
                  if (lastVisitDate >= sixMonthsAgo) {
                     const monthString = lastVisitDate.toLocaleDateString('pt-BR', { month: 'short' });

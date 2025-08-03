@@ -20,7 +20,15 @@
       "Bash(npx tsc:*)",
       "Bash(npm uninstall:*)",
       "Bash(npm run preview:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx vite build:*)",
+      "Bash(ls:*)",
+      "Bash(npx vercel:*)",
+      "Bash(npm remove:*)",
+      "WebFetch(domain:fisioflow-20-5ny0xugz5-rafael-minattos-projects.vercel.app)"
     ],
     "deny": []
   }

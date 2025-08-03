@@ -33,8 +33,8 @@ const useClinicalAnalytics = () => {
       // Calculate KPIs
       const ninetyDaysAgo = new Date();
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-      const dischargedPatients = mockPatients.filter(p => p.status === 'Discharged' && new Date(p.lastVisit) > ninetyDaysAgo).length;
-      const activePatients = mockPatients.filter(p => p.status === 'Active').length;
+      const dischargedPatients = mockPatients.filter(p => p.status === 'Alta' && new Date(p.lastVisit) > ninetyDaysAgo).length;
+      const activePatients = mockPatients.filter(p => p.status === 'Ativo').length;
       const dischargeRate = activePatients > 0 ? Math.round((dischargedPatients / (dischargedPatients + activePatients)) * 100) : 0;
       
       const completedAppointments = mockAppointments.filter(a => a.status === AppointmentStatus.Completed);

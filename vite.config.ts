@@ -19,5 +19,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom']
+  },
+  define: {
+    // Ensure process.env is not referenced in client code
+    'process.env': {}
   }
 });

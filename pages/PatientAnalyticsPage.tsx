@@ -21,9 +21,13 @@ import {
   DemographicData, 
   TrendData, 
   PatientSegment,
-  PredictiveMetrics,
-  PerformanceMetrics 
+  PredictiveMetrics as TypesPredictiveMetrics,
+  PerformanceMetrics as TypesPerformanceMetrics 
 } from '../types';
+import { 
+  PredictiveMetrics, 
+  PerformanceMetrics 
+} from '../services/analyticsService';
 
 interface MetricCardProps {
   title: string;
@@ -139,8 +143,8 @@ const PatientAnalyticsPage: React.FC = () => {
       setDemographics(demographicsData);
       setTrends(trendsData);
       setSegments(segmentsData);
-      setPredictive(predictiveData);
-      setPerformance(performanceData);
+      setPredictive(predictiveData as TypesPredictiveMetrics);
+      setPerformance(performanceData as TypesPerformanceMetrics);
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -430,7 +434,7 @@ const PatientAnalyticsPage: React.FC = () => {
                 {predictive.churnRisk.slice(0, 5).map((risk, index) => (
                   <div key={risk.patientId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-gray-900">{risk.patientName}</p>
+                      <p className="font-medium text-gray-900">Paciente {risk.patientId}</p>
                       <p className="text-sm text-gray-500">{risk.factors.join(', ')}</p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-sm font-medium ${

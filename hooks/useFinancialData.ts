@@ -63,7 +63,7 @@ const useFinancialData = (period: TimePeriod) => {
         const grossRevenue = completedAppointments.reduce((sum, t) => sum + t.value, 0);
         const totalExpenses = grossRevenue * 0.45; // Mock expenses
         const netProfit = grossRevenue - totalExpenses;
-        const activePatients = mockPatients.filter(p => p.status === 'Active').length;
+        const activePatients = mockPatients.filter(p => p.status === 'Ativo').length;
         const averageTicket = completedAppointments.length > 0 ? grossRevenue / completedAppointments.length : 0;
 
         // Process Cash Flow Data

@@ -201,7 +201,7 @@ const DashboardPage: React.FC = () => {
       new Date(apt.startTime).toDateString() === new Date().toDateString()
     ).length;
     
-    const activePatients = patients.filter(patient => patient.status === 'Active').length;
+    const activePatients = patients.filter(patient => patient.status === 'Ativo').length;
     const completedAppointments = appointments.filter(apt => apt.status === AppointmentStatus.Completed).length;
     const pendingAppointments = appointments.filter(apt => apt.status === AppointmentStatus.Scheduled).length;
 

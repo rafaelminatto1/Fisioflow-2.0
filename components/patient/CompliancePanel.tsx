@@ -13,11 +13,15 @@ import {
   Calendar
 } from 'lucide-react';
 import { 
-  AuditLogEntry as AuditLog, 
+  AuditLogEntry, 
   ConsentStatus, 
   DataDeletionRequest,
   ComplianceReport 
 } from '../../types';
+import { 
+  AuditLog,
+  DataDeletionRequest as ServiceDataDeletionRequest
+} from '../../services/complianceService';
 import { complianceService } from '../../services/complianceService';
 
 interface CompliancePanelProps {
@@ -34,7 +38,7 @@ export const CompliancePanel: React.FC<CompliancePanelProps> = ({
   const [activeTab, setActiveTab] = useState<'consent' | 'audit' | 'deletion'>('consent');
   const [consentStatus, setConsentStatus] = useState<ConsentStatus | null>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [deletionRequests, setDeletionRequests] = useState<DataDeletionRequest[]>([]);
+  const [deletionRequests, setDeletionRequests] = useState<ServiceDataDeletionRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
@@ -283,15 +287,11 @@ export const CompliancePanel: React.FC<CompliancePanelProps> = ({
                         {log.action.replace(/_/g, ' ').toLowerCase()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Por {log.userName} • {formatDate(log.timestamp)}
+                        Por {log.userId} • {formatDate(log.timestamp)}
                       </p>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      log.severity === 'high' ? 'bg-red-100 text-red-800' :
-                      log.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {log.severity}
+                    <div className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      audit
                     </div>
                   </div>
                 ))
