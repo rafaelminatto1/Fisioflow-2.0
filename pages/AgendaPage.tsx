@@ -14,7 +14,7 @@ import { useTherapists } from '../hooks/useTherapists';
 import { generateRecurrences } from '../services/scheduling/recurrenceService';
 import { useToast } from '../contexts/ToastContext';
 
-const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM (19:00)
+const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM (20:00)
 
 const AgendaPage: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -168,10 +168,16 @@ const AgendaPage: React.FC = () => {
   }
 
   const renderGrid = (cols: any[], colRenderer: (col: any, colIdx: number) => React.ReactNode) => (
-     <div className={`grid grid-cols-[auto_repeat(${cols.length},minmax(0,1fr))]`}>
-        {/* Body */}
-        <div className="relative col-start-1 col-end-2 row-start-1 row-end-auto">
-            {hours.map(hour => <div key={hour} className="h-[60px] text-right pr-2 -mt-2.5 relative"><span className="absolute right-2 text-xs text-slate-400">{hour}:00</span></div>)}
+     <div className={`grid grid-cols-[60px_repeat(${cols.length},minmax(0,1fr))] sm:grid-cols-[80px_repeat(${cols.length},minmax(0,1fr))] gap-0`}>
+        {/* Time column */}
+        <div className="relative bg-slate-50 border-r border-slate-200">
+            {hours.map(hour => (
+                <div key={hour} className="h-12 sm:h-16 flex items-center justify-end pr-2 sm:pr-3 border-b border-slate-100">
+                    <span className="text-xs sm:text-sm font-medium text-slate-600">
+                        {hour.toString().padStart(2, '0')}:00
+                    </span>
+                </div>
+            ))}
         </div>
         {cols.map(colRenderer)}
     </div>
@@ -179,20 +185,116 @@ const AgendaPage: React.FC = () => {
 
   const renderWeekView = () => renderGrid(weekDays, (day, dayIdx) => {
     const dayAppointments = appointments.filter(app => app.startTime.toDateString() === day.toDateString());
+    const isToday = day.toDateString() === new Date().toDateString();
+    
     return (
-        <div key={day.toISOString()} className="relative border-l border-slate-200">
-            {hours.map((hour) => <div key={hour} onClick={() => handleOpenFormToCreate(new Date(day.setHours(hour,0,0,0)))} className="h-[60px] border-t border-slate-200 hover:bg-sky-50/50 cursor-pointer"></div>)}
-            {dayAppointments.map(app => <AppointmentCard key={app.id} appointment={app} therapists={therapists} onSelect={() => handleSelectAppointment(app)}/>)}
+        <div key={day.toISOString()} className={`relative border-r border-slate-200 ${isToday ? 'bg-blue-50/30' : 'bg-white'}`}>
+            {/* Hour slots */}
+            {hours.map((hour) => (
+                <div 
+                    key={hour} 
+                    onClick={() => {
+                        const newDate = new Date(day);
+                        newDate.setHours(hour, 0, 0, 0);
+                        handleOpenFormToCreate(newDate);
+                    }}
+                    className="h-12 sm:h-16 border-b border-slate-100 hover:bg-blue-50/50 cursor-pointer transition-colors relative group"
+                >
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                    </div>
+                </div>
+            ))}
+            
+            {/* Current time indicator for today */}
+            {isToday && (() => {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinutes = now.getMinutes();
+                
+                if (currentHour >= hours[0] && currentHour <= hours[hours.length - 1]) {
+                    const cellHeight = window.innerWidth < 640 ? 48 : 64; // sm breakpoint
+                    const topPosition = ((currentHour - hours[0]) * cellHeight) + (currentMinutes * cellHeight / 60);
+                    return (
+                        <div 
+                            className="absolute left-0 right-0 h-0.5 bg-red-500 z-20"
+                            style={{ top: `${topPosition}px` }}
+                        >
+                            <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                        </div>
+                    );
+                }
+                return null;
+            })()}
+            
+            {/* Appointments */}
+            {dayAppointments.map(app => (
+                <AppointmentCard 
+                    key={app.id} 
+                    appointment={app} 
+                    therapists={therapists} 
+                    onSelect={() => handleSelectAppointment(app)}
+                />
+            ))}
         </div>
     );
   });
 
   const renderDayView = () => renderGrid(therapists, (therapist, therapistIdx) => {
-    const dayAppointments = appointments.filter(app => app.startTime.toDateString() === currentDate.toDateString() && app.therapistId === therapist.id);
+    const dayAppointments = appointments.filter(app => 
+        app.startTime.toDateString() === currentDate.toDateString() && 
+        app.therapistId === therapist.id
+    );
+    
     return (
-        <div key={therapist.id} className="relative border-l border-slate-200">
-            {hours.map((hour) => <div key={hour} onClick={() => handleOpenFormToCreate(new Date(currentDate.setHours(hour,0,0,0)), therapist.id)} className="h-[60px] border-t border-slate-200 hover:bg-sky-50/50 cursor-pointer"></div>)}
-            {dayAppointments.map(app => <AppointmentCard key={app.id} appointment={app} therapists={therapists} onSelect={() => handleSelectAppointment(app)}/>)}
+        <div key={therapist.id} className="relative border-r border-slate-200 bg-white">
+            {/* Hour slots */}
+            {hours.map((hour) => (
+                <div 
+                    key={hour} 
+                    onClick={() => {
+                        const newDate = new Date(currentDate);
+                        newDate.setHours(hour, 0, 0, 0);
+                        handleOpenFormToCreate(newDate, therapist.id);
+                    }}
+                    className="h-12 sm:h-16 border-b border-slate-100 hover:bg-blue-50/50 cursor-pointer transition-colors relative group"
+                >
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
+                    </div>
+                </div>
+            ))}
+            
+            {/* Current time indicator for today */}
+            {currentDate.toDateString() === new Date().toDateString() && (() => {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinutes = now.getMinutes();
+                
+                if (currentHour >= hours[0] && currentHour <= hours[hours.length - 1]) {
+                    const cellHeight = window.innerWidth < 640 ? 48 : 64; // sm breakpoint
+                    const topPosition = ((currentHour - hours[0]) * cellHeight) + (currentMinutes * cellHeight / 60);
+                    return (
+                        <div 
+                            className="absolute left-0 right-0 h-0.5 bg-red-500 z-20"
+                            style={{ top: `${topPosition}px` }}
+                        >
+                            <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                        </div>
+                    );
+                }
+                return null;
+            })()}
+            
+            {/* Appointments */}
+            {dayAppointments.map(app => (
+                <AppointmentCard 
+                    key={app.id} 
+                    appointment={app} 
+                    therapists={therapists} 
+                    onSelect={() => handleSelectAppointment(app)}
+                />
+            ))}
         </div>
     );
   });
@@ -201,18 +303,40 @@ const AgendaPage: React.FC = () => {
       const cols = viewMode === 'week' ? weekDays : therapists;
 
       return (
-         <div className={`grid grid-cols-[auto_repeat(${cols.length},minmax(0,1fr))]`}>
-            <div className="p-4 text-xs font-medium text-slate-500 uppercase tracking-wider flex items-center justify-center"><Clock className="w-4 h-4" /></div>
+         <div className={`grid grid-cols-[60px_repeat(${cols.length},minmax(0,1fr))] sm:grid-cols-[80px_repeat(${cols.length},minmax(0,1fr))] gap-0 bg-white border-b border-slate-200`}>
+            {/* Time header */}
+            <div className="px-2 sm:px-4 py-3 bg-slate-50 border-r border-slate-200 flex items-center justify-center">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+            </div>
+            
+            {/* Column headers */}
             {viewMode === 'week' ?
-                weekDays.map((day: Date) => (
-                    <div key={day.toISOString()} className="p-4 text-center border-l border-slate-200">
-                        <p className="text-xs font-medium text-slate-500 uppercase">{day.toLocaleDateString('pt-BR', { weekday: 'short' })}</p>
-                        <p className="text-2xl font-bold text-slate-800">{day.getDate()}</p>
-                    </div>
-                )) :
+                weekDays.map((day: Date) => {
+                    const isToday = day.toDateString() === new Date().toDateString();
+                    return (
+                        <div key={day.toISOString()} className={`px-2 sm:px-4 py-3 text-center border-r border-slate-200 ${isToday ? 'bg-blue-50' : 'bg-white'}`}>
+                            <p className={`text-xs font-semibold uppercase tracking-wide ${isToday ? 'text-blue-600' : 'text-slate-500'}`}>
+                                {day.toLocaleDateString('pt-BR', { weekday: 'short' })}
+                            </p>
+                            <p className={`text-lg sm:text-xl font-bold ${isToday ? 'text-blue-600' : 'text-slate-800'}`}>
+                                {day.getDate()}
+                            </p>
+                            {isToday && (
+                                <div className="mt-1">
+                                    <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }) :
                 therapists.map((therapist: Therapist) => (
-                    <div key={therapist.id} className="p-4 text-center border-l border-slate-200">
-                        <p className={`font-bold text-sm text-${therapist.color}-600`}>{therapist.name}</p>
+                    <div key={therapist.id} className="px-2 sm:px-4 py-3 text-center border-r border-slate-200 bg-white">
+                        <div className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full bg-${therapist.color}-100`}>
+                            <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-${therapist.color}-500`}></div>
+                            <p className={`font-semibold text-xs sm:text-sm text-${therapist.color}-700 truncate`}>
+                                {therapist.name.split(' ')[0]}
+                            </p>
+                        </div>
                     </div>
                 ))
             }
@@ -223,16 +347,52 @@ const AgendaPage: React.FC = () => {
   return (
     <>
       <PageHeader title="Agenda" subtitle="Visualize e gerencie suas consultas.">
-        <div className="flex items-center rounded-lg bg-white p-1 border border-slate-200 shadow-sm">
-          <button onClick={() => changeDate(-1)} className="p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-md"><ChevronLeft className="h-5 w-5" /></button>
-          <h3 className="text-sm font-semibold text-slate-700 px-4 text-center w-52">{getHeaderTitle()}</h3>
-          <button onClick={() => changeDate(1)} className="p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-md"><ChevronRight className="h-5 w-5" /></button>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+          {/* Navigation controls */}
+          <div className="flex items-center rounded-lg bg-white p-1 border border-slate-200 shadow-sm">
+            <button onClick={() => changeDate(-1)} className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <h3 className="text-sm font-semibold text-slate-700 px-4 text-center min-w-0 flex-1 sm:w-52">
+              {getHeaderTitle()}
+            </h3>
+            <button onClick={() => changeDate(1)} className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+          
+          {/* View mode toggle */}
+          <div className="flex items-center rounded-lg bg-white p-1 border border-slate-200 shadow-sm sm:ml-2">
+            <button 
+              onClick={() => setViewMode('day')} 
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'day' ? 'bg-blue-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Users className="w-4 h-4 inline mr-1 sm:mr-2"/>
+              <span className="hidden sm:inline">Dia</span>
+            </button>
+            <button 
+              onClick={() => setViewMode('week')} 
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'week' ? 'bg-blue-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-1 sm:mr-2"/>
+              <span className="hidden sm:inline">Semana</span>
+            </button>
+          </div>
+          
+          {/* Add appointment button */}
+          <button 
+            onClick={() => handleOpenFormToCreate()} 
+            className="sm:ml-4 inline-flex items-center justify-center rounded-lg border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="-ml-1 mr-2 h-5 w-5"/>
+            <span className="hidden sm:inline">Agendar</span>
+            <span className="sm:hidden">Nova</span>
+          </button>
         </div>
-        <div className="flex items-center rounded-lg bg-white p-1 border border-slate-200 shadow-sm ml-2">
-            <button onClick={() => setViewMode('day')} className={`px-3 py-1.5 text-sm font-medium rounded-md ${viewMode === 'day' ? 'bg-sky-500 text-white' : 'text-slate-600 hover:bg-slate-100'}`}><Users className="w-4 h-4 inline mr-2"/>Dia</button>
-            <button onClick={() => setViewMode('week')} className={`px-3 py-1.5 text-sm font-medium rounded-md ${viewMode === 'week' ? 'bg-sky-500 text-white' : 'text-slate-600 hover:bg-slate-100'}`}><Calendar className="w-4 h-4 inline mr-2"/>Semana</button>
-        </div>
-        <button onClick={() => handleOpenFormToCreate()} className="ml-4 inline-flex items-center justify-center rounded-lg border border-transparent bg-sky-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-600"><Plus className="-ml-1 mr-2 h-5 w-5"/>Agendar</button>
       </PageHeader>
       
       {isDetailModalOpen && (
@@ -271,7 +431,7 @@ const AgendaPage: React.FC = () => {
         ) : error ? (
             <div className="text-center p-10 text-red-500">{error.message}</div>
         ) : (
-            <div className={`relative h-[calc(12*60px)]`}>
+            <div className="relative h-[calc(14*48px)] sm:h-[calc(14*64px)] overflow-auto">
                 {viewMode === 'week' ? renderWeekView() : renderDayView()}
             </div>
         )}

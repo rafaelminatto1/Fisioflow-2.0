@@ -14,18 +14,58 @@ const AppointmentCard = ({ appointment, therapists, onSelect }: AppointmentCardP
   const endMinutes = appointment.endTime.getMinutes();
 
   const duration = (endHour * 60 + endMinutes) - (startHour * 60 + startMinutes);
-  const top = ((startHour - 8) * 60 + startMinutes);
-  const height = duration;
+  
+  // Responsive cell height based on screen size
+  const getCellHeight = () => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 640 ? 48 : 64;
+    }
+    return 64; // Default for SSR
+  };
+  
+  const cellHeight = getCellHeight();
+  const top = ((startHour - 7) * cellHeight) + (startMinutes * cellHeight / 60);
+  const height = (duration * cellHeight) / 60;
 
   const therapist = therapists.find(t => t.id === appointment.therapistId);
   const color = therapist?.color || 'slate';
 
-  const statusClasses = {
-    [AppointmentStatus.Scheduled]: `bg-${color}-100 border-${color}-500 text-${color}-800 hover:bg-${color}-200`,
-    [AppointmentStatus.Completed]: 'bg-slate-100 border-slate-400 text-slate-600 hover:bg-slate-200',
-    [AppointmentStatus.Canceled]: 'bg-red-100 border-red-400 text-red-700 line-through hover:bg-red-200',
-    [AppointmentStatus.NoShow]: 'bg-yellow-100 border-yellow-500 text-yellow-800 hover:bg-yellow-200',
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
+
+  const statusClasses = {
+    [AppointmentStatus.Scheduled]: {
+      bg: `bg-${color}-100`,
+      border: `border-l-4 border-${color}-500`,
+      text: `text-${color}-800`,
+      hover: `hover:bg-${color}-200`,
+      shadow: 'shadow-sm hover:shadow-md'
+    },
+    [AppointmentStatus.Completed]: {
+      bg: 'bg-green-50',
+      border: 'border-l-4 border-green-500',
+      text: 'text-green-700',
+      hover: 'hover:bg-green-100',
+      shadow: 'shadow-sm hover:shadow-md'
+    },
+    [AppointmentStatus.Canceled]: {
+      bg: 'bg-red-50',
+      border: 'border-l-4 border-red-400',
+      text: 'text-red-600 line-through',
+      hover: 'hover:bg-red-100',
+      shadow: 'shadow-sm hover:shadow-md'
+    },
+    [AppointmentStatus.NoShow]: {
+      bg: 'bg-orange-50',
+      border: 'border-l-4 border-orange-400',
+      text: 'text-orange-700',
+      hover: 'hover:bg-orange-100',
+      shadow: 'shadow-sm hover:shadow-md'
+    },
+  };
+
+  const statusStyle = statusClasses[appointment.status];
 
   // This is a TailwindCSS JIT compiler limitation workaround.
   // The full class names must be present in the source code.
@@ -36,20 +76,57 @@ const AppointmentCard = ({ appointment, therapists, onSelect }: AppointmentCardP
   return (
     <div
       onClick={onSelect}
-      className={`absolute left-2 right-2 p-2 rounded-lg border-l-4 text-xs z-10 cursor-pointer transition-colors overflow-hidden ${statusClasses[appointment.status]}`}
-      style={{ top: `${top}px`, height: `${height}px`, minHeight: '30px' }}
-      title={`${appointment.title}\nPaciente: ${appointment.patientName}\nTipo: ${appointment.type}`}
+      className={`absolute left-1 right-1 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 overflow-hidden z-10 
+        ${statusStyle.bg} ${statusStyle.border} ${statusStyle.text} ${statusStyle.hover} ${statusStyle.shadow}`}
+      style={{ 
+        top: `${top}px`, 
+        height: `${Math.max(height, cellHeight * 0.8)}px`,
+        minHeight: `${cellHeight * 0.8}px`
+      }}
+      title={`${appointment.title}\nPaciente: ${appointment.patientName}\nTipo: ${appointment.type}\nHorário: ${formatTime(appointment.startTime)} - ${formatTime(appointment.endTime)}`}
     >
-      <div className="flex justify-between items-start">
-        <p className="font-bold truncate">{appointment.patientName}</p>
-        {appointment.seriesId && 
-            <span className="flex-shrink-0" title="Consulta Recorrente">
-                <Repeat className="w-3 h-3" />
-            </span>
-        }
+      <div className="flex justify-between items-start mb-1">
+        <p className="font-semibold text-xs sm:text-sm truncate flex-1 pr-1 sm:pr-2">
+          {appointment.patientName}
+        </p>
+        {appointment.seriesId && (
+          <span className="flex-shrink-0 p-0.5 sm:p-1 rounded-full bg-white/20" title="Consulta Recorrente">
+            <Repeat className="w-2 h-2 sm:w-3 sm:h-3" />
+          </span>
+        )}
       </div>
-      <p className="truncate text-xs">{appointment.type}</p>
-      <p className="truncate">{appointment.title}</p>
+      
+      <div className="space-y-0.5 sm:space-y-1">
+        <p className="text-xs font-medium opacity-75 truncate">
+          {appointment.type}
+        </p>
+        
+        <p className="text-xs opacity-60 truncate">
+          {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+        </p>
+        
+        {height > (cellHeight * 1.2) && appointment.title && (
+          <p className="text-xs opacity-75 truncate">
+            {appointment.title}
+          </p>
+        )}
+        
+        {appointment.value && height > (cellHeight * 1.8) && (
+          <p className="text-xs font-medium opacity-80">
+            R$ {appointment.value.toFixed(2)}
+          </p>
+        )}
+      </div>
+      
+      {/* Status indicator */}
+      <div className="absolute top-1 sm:top-2 right-1 sm:right-2">
+        <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
+          appointment.status === AppointmentStatus.Scheduled ? `bg-${color}-500` :
+          appointment.status === AppointmentStatus.Completed ? 'bg-green-500' :
+          appointment.status === AppointmentStatus.Canceled ? 'bg-red-400' :
+          'bg-orange-400'
+        }`}></div>
+      </div>
     </div>
   );
 };
