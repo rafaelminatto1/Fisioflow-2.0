@@ -3,7 +3,7 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "rm -rf node_modules package-lock.json && npm install --no-optional --legacy-peer-deps",
   "rewrites": [
     {
       "source": "/manifest.json",
