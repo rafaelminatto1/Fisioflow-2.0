@@ -50,6 +50,16 @@ const App = () => {
           throw new Error('React is not available');
         }
         
+        // Unregister any existing service workers
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => {
+              console.log('Unregistering service worker:', registration);
+              registration.unregister();
+            });
+          });
+        }
+        
         // Add a small delay to ensure everything is loaded
         await new Promise(resolve => setTimeout(resolve, 200));
         

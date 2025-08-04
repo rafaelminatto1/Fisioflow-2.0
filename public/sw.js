@@ -1,7 +1,7 @@
-// Service Worker temporariamente desabilitado para debugging
-console.log('Service Worker loaded but disabled for debugging');
+// Service Worker completamente desabilitado
+console.log('Service Worker disabled - unregistering...');
 
-// Limpar cache existente
+// Limpar todos os caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -11,11 +11,12 @@ self.addEventListener('activate', event => {
           return caches.delete(cacheName);
         })
       );
+    }).then(() => {
+      // Desregistrar o service worker
+      return self.registration.unregister();
     })
   );
 });
 
-// Não interceptar requests - deixar passar direto
-self.addEventListener('fetch', event => {
-  // Não fazer nada - deixar o browser lidar com as requests normalmente
-});
+// Não fazer nada nos fetch events
+// (removido para evitar overhead)
