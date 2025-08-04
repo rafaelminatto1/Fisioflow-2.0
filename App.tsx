@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
 import AppDebug from './App.debug';
+import SimpleApp from './App.simple';
 
 // Lazy load components to avoid blocking the main thread
 const AppRoutes = React.lazy(() => import('./AppRoutes'));
@@ -15,6 +16,12 @@ const App = () => {
   const isDebugMode = (
     window.location.search.includes('debug=true') || 
     localStorage.getItem('fisioflow_debug') === 'true'
+  );
+  
+  // Simple mode for basic testing
+  const isSimpleMode = (
+    window.location.search.includes('simple=true') || 
+    localStorage.getItem('fisioflow_simple') === 'true'
   );
   
   useEffect(() => {
@@ -60,6 +67,10 @@ const App = () => {
   
   if (isDebugMode) {
     return <AppDebug />;
+  }
+  
+  if (isSimpleMode) {
+    return <SimpleApp />;
   }
   
   if (hasError) {
