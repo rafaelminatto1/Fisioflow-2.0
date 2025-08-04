@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test - FisioFlow</title>
+    <link rel="manifest" href="/manifest.json" />
+</head>
+<body>
+    <h1>Simple React Test</h1>
+    <div id="root">Loading...</div>
+    
+    <script>
+        console.log('Starting simple test...');
+        
+        // Simple React simulation
+        setTimeout(() => {
+            document.getElementById('root').innerHTML = '<h2>React would be loaded here</h2><p>Basic HTML is working!</p>';
+            console.log('Simple test completed');
+        }, 1000);
+        
+        // Test manifest access
+        fetch('/manifest.json')
+            .then(response => {
+                console.log('Manifest fetch status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Manifest data:', data);
+            })
+            .catch(error => {
+                console.error('Manifest fetch error:', error);
+            });
+    </script>
+</body>
+</html>
