@@ -2,7 +2,7 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   // Load environment variables
   const env = loadEnv(mode, process.cwd(), '');
   const isProduction = mode === 'production';
@@ -11,8 +11,6 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [
       react({
-        // Enable React Fast Refresh in development
-        fastRefresh: isDevelopment,
         // Optimize JSX runtime for production
         jsxRuntime: 'automatic'
       })
@@ -100,42 +98,38 @@ export default defineConfig(({ command, mode }) => {
       
       // Enhanced rollup options
       rollupOptions: {
-        // External dependencies (for library builds)
+        // External dependencies (for library builds) - ensure nothing is externalized
         external: [],
         
-        // Input configuration
-        input: {
-          main: path.resolve(__dirname, 'index.html')
-        },
+        // Input configuration - simplified
+        input: path.resolve(__dirname, 'index.html'),
         
         output: {
-          // Optimized chunk file naming
-          chunkFileNames: (chunkInfo) => {
-            const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
-            return `assets/js/[name]-[hash].js`;
-          },
+          // Simplified and consistent chunk file naming
+          chunkFileNames: `assets/[name]-[hash].js`,
           
-          // Optimized asset file naming
+          // Simplified asset file naming
           assetFileNames: (assetInfo) => {
+            if (!assetInfo.name) return `assets/[name]-[hash][extname]`;
             const info = assetInfo.name.split('.');
             const ext = info[info.length - 1];
-            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
-              return `assets/images/[name]-[hash][extname]`;
+            if (ext && /png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+              return `assets/[name]-[hash][extname]`;
             }
-            if (/css/i.test(ext)) {
-              return `assets/css/[name]-[hash][extname]`;
+            if (ext && /css/i.test(ext)) {
+              return `assets/[name]-[hash][extname]`;
             }
-            if (/woff2?|eot|ttf|otf/i.test(ext)) {
-              return `assets/fonts/[name]-[hash][extname]`;
+            if (ext && /woff2?|eot|ttf|otf/i.test(ext)) {
+              return `assets/[name]-[hash][extname]`;
             }
             return `assets/[name]-[hash][extname]`;
           },
           
           // Entry file naming
-          entryFileNames: `assets/js/[name]-[hash].js`,
+          entryFileNames: `assets/[name]-[hash].js`,
           
           // Let Vite automatically handle chunk splitting for optimal performance
-          manualChunks: undefined
+          manualChunks: undefined as any
         },
         
         // Enhanced warning handling
@@ -213,14 +207,11 @@ export default defineConfig(({ command, mode }) => {
         '@google/genai'
       ],
       
-      // Exclude problematic dependencies
-      exclude: [
-        '@rollup/rollup-win32-x64-msvc',
-        'fsevents'
-      ],
+      // Don't exclude any dependencies for now
+      exclude: [],
       
       // Force optimization for specific dependencies
-      force: isDevelopment,
+      force: false,
       
       // ESBuild options for dependency optimization
       esbuildOptions: {
@@ -293,15 +284,7 @@ export default defineConfig(({ command, mode }) => {
       plugins: []
     },
     
-    // Experimental features
-    experimental: {
-      renderBuiltUrl: (filename, { hostType }) => {
-        if (hostType === 'js') {
-          return { js: `/${filename}` };
-        } else {
-          return { relative: true };
-        }
-      }
-    }
+    // Base URL configuration for proper asset paths
+    base: '/'
   };
 });

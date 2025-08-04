@@ -1,6 +1,7 @@
 
 
 import { Patient, PatientAttachment, SearchFilters, EnhancedPatient, PatientDocument, PatientTag, CustomField, PatientPreferences, ExportOptions } from '../types';
+
 import { apiClient, ApiError } from './apiClient';
 import { searchService } from './searchService';
 import { complianceService, AuditAction } from './complianceService';
@@ -62,6 +63,17 @@ class PatientService {
     }
   }
 
+  async deletePatient(id: string): Promise<void> {
+    try {
+      await apiClient.delete(`/patients/${id}`);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(`Erro ao deletar paciente: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
   async addAttachment(patientId: string, file: File): Promise<PatientAttachment> {
     try {
       const formData = new FormData();
@@ -72,6 +84,17 @@ class PatientService {
     } catch (error) {
       if (error instanceof ApiError) {
         throw new Error(`Erro ao adicionar anexo: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  async removeAttachment(patientId: string, attachmentId: string): Promise<void> {
+    try {
+      await apiClient.delete(`/patients/${patientId}/attachments/${attachmentId}`);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(`Erro ao remover anexo: ${error.message}`);
       }
       throw error;
     }
@@ -96,6 +119,33 @@ class PatientService {
       );
     }
     return searchService.searchPatients(filters, page, pageSize);
+  }
+
+  async getEnhancedPatients(): Promise<EnhancedPatient[]> {
+    try {
+      const patients = await this.getPatients();
+      // Transform regular patients to enhanced patients with additional metadata
+      return patients.map(patient => ({
+        ...patient,
+        totalAppointments: 0, // This would be calculated from appointments
+        lastAppointmentDate: patient.lastVisit,
+        upcomingAppointments: 0,
+        treatmentProgress: 0,
+        riskScore: 0,
+        tags: [],
+        customFields: [],
+        preferences: {
+          communicationMethod: 'email',
+          reminderFrequency: 'daily',
+          language: 'pt-BR'
+        }
+      }));
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(`Erro ao buscar pacientes aprimorados: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
   async getPatientWithAudit(
@@ -244,6 +294,39 @@ class PatientService {
     return csvRows.join('\r\n');
   }
 
+  async importPatients(file: File, userId: string): Promise<{ success: number; errors: string[] }> {
+    try {
+      const text = await file.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',');
+      
+      let success = 0;
+      const errors: string[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        try {
+          const values = lines[i].split(',');
+          const patientData: any = {};
+          
+          headers.forEach((header, index) => {
+            patientData[header.trim()] = values[index]?.trim() || '';
+          });
+          
+          await this.addPatientWithAudit(patientData, userId, 'Import User');
+          success++;
+        } catch (error) {
+          errors.push(`Linha ${i + 1}: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+        }
+      }
+      
+      return { success, errors };
+    } catch (error) {
+      throw new Error(`Erro ao importar pacientes: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+    }
+  }
+
   async getPatientSuggestions(query: string): Promise<Patient[]> {
     if (!query) {
       return [];
@@ -268,6 +351,7 @@ class PatientService {
   }
 }
 
+// Create PatientService instance
 const patientServiceInstance = new PatientService();
 
 // Export individual functions to match namespace import pattern
