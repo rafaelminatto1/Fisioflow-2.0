@@ -1,4 +1,4 @@
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
 import { ZodSchema, ZodError } from 'zod';
 
 /**
@@ -142,7 +142,10 @@ export const isValidCNPJ = (cnpj: string): boolean => {
   
   let sum = 0;
   for (let i = 0; i < 12; i++) {
-    sum += parseInt(numbers.charAt(i)) * weights1[i];
+    const weight = weights1[i];
+    if (weight !== undefined) {
+      sum += parseInt(numbers.charAt(i)) * weight;
+    }
   }
   
   let remainder = sum % 11;
@@ -152,7 +155,10 @@ export const isValidCNPJ = (cnpj: string): boolean => {
   
   sum = 0;
   for (let i = 0; i < 13; i++) {
-    sum += parseInt(numbers.charAt(i)) * weights2[i];
+    const weight = weights2[i];
+    if (weight !== undefined) {
+      sum += parseInt(numbers.charAt(i)) * weight;
+    }
   }
   
   remainder = sum % 11;
@@ -183,7 +189,7 @@ export const transformFormData = <T extends Record<string, any>>(
 /**
  * Reset form with optional new default values
  */
-export const resetFormWithDefaults = <T>(
+export const resetFormWithDefaults = <T extends FieldValues>(
   form: UseFormReturn<T>, 
   defaultValues?: Partial<T>
 ) => {
@@ -194,14 +200,14 @@ export const resetFormWithDefaults = <T>(
 /**
  * Check if form has unsaved changes
  */
-export const hasUnsavedChanges = <T>(form: UseFormReturn<T>): boolean => {
+export const hasUnsavedChanges = <T extends FieldValues>(form: UseFormReturn<T>): boolean => {
   return form.formState.isDirty;
 };
 
 /**
  * Get form field error message
  */
-export const getFieldError = <T>(form: UseFormReturn<T>, fieldName: keyof T): string | undefined => {
+export const getFieldError = <T extends FieldValues>(form: UseFormReturn<T>, fieldName: keyof T): string | undefined => {
   const error = form.formState.errors[fieldName];
   if (error && typeof error === 'object' && 'message' in error) {
     return error.message as string;

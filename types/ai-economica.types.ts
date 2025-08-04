@@ -51,6 +51,7 @@ export interface KnowledgeEntry {
   createdAt: Date;
   updatedAt: Date;
   confidenceScore: number; // 0-100
+  confidence: number; // Alias for confidenceScore for backward compatibility
   sources: string[];
   validatedBy?: string;
   usageCount: number;
@@ -58,6 +59,11 @@ export interface KnowledgeEntry {
   relatedEntries: string[];
   isPublic: boolean;
   specialty: string;
+  // Additional properties for search functionality
+  diagnosis?: string;
+  symptoms?: string[];
+  techniques?: string[];
+  category?: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   evidence: 'high' | 'moderate' | 'low' | 'expert_opinion';
   lastReviewed?: Date;
@@ -290,6 +296,8 @@ export interface SystemHealth {
 export interface SearchQuery {
   text: string;
   type?: QueryType;
+  category?: string;
+  specialty?: string;
   filters?: {
     tags?: string[];
     specialty?: string;
@@ -314,6 +322,7 @@ export interface SearchQuery {
 export interface SearchResult {
   entry: KnowledgeEntry;
   relevanceScore: number;
+  score: number; // Alias for relevanceScore for backward compatibility
   highlights: string[];
   matchedTags: string[];
   reasoning: string;

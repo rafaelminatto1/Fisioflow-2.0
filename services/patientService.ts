@@ -268,4 +268,22 @@ class PatientService {
   }
 }
 
-export const patientService = new PatientService();
+const patientServiceInstance = new PatientService();
+
+// Export individual functions to match namespace import pattern
+export const getPatients = patientServiceInstance.getPatients.bind(patientServiceInstance);
+export const getPatientById = patientServiceInstance.getPatientById.bind(patientServiceInstance);
+export const addPatient = patientServiceInstance.addPatient.bind(patientServiceInstance);
+export const updatePatient = patientServiceInstance.updatePatient.bind(patientServiceInstance);
+export const deletePatient = patientServiceInstance.deletePatient.bind(patientServiceInstance);
+export const addPatientWithAudit = patientServiceInstance.addPatientWithAudit.bind(patientServiceInstance);
+export const updatePatientWithAudit = patientServiceInstance.updatePatientWithAudit.bind(patientServiceInstance);
+export const addAttachment = patientServiceInstance.addAttachment.bind(patientServiceInstance);
+export const removeAttachment = patientServiceInstance.removeAttachment.bind(patientServiceInstance);
+export const searchPatients = patientServiceInstance.searchPatients.bind(patientServiceInstance);
+export const getEnhancedPatients = patientServiceInstance.getEnhancedPatients.bind(patientServiceInstance);
+export const exportPatients = patientServiceInstance.exportPatients.bind(patientServiceInstance);
+export const importPatients = patientServiceInstance.importPatients.bind(patientServiceInstance);
+
+// Also export the instance for backward compatibility
+export const patientService = patientServiceInstance;

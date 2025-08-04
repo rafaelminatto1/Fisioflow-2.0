@@ -23,18 +23,17 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     
-    // Strict mode configuration - Fully relaxed for deployment
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
-    "noImplicitReturns": false,
-    "noFallthroughCasesInSwitch": false,
-    "noUncheckedIndexedAccess": false,
-    "noImplicitOverride": false,
-    "allowUnusedLabels": true,
-    "allowUnreachableCode": true,
-    "noImplicitAny": false,
+    // Strict mode configuration - Enabled for deployment safety
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
     
     // Additional type checking
     "forceConsistentCasingInFileNames": true,

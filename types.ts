@@ -158,7 +158,7 @@ export interface StatCardData {
   value: string;
   change?: string;
   changeType?: 'increase' | 'decrease';
-  icon: React.ReactNode;
+  icon: import('react').ReactNode;
 }
 
 export interface TreatmentPlan {
@@ -462,7 +462,7 @@ export type Achievement = {
   name: string;
   description: string;
   unlocked: boolean;
-  icon: React.ElementType;
+  icon: import('react').ElementType;
 };
 // --- Notifications ---
 export interface Notification {

@@ -69,4 +69,13 @@ class NotificationService {
   }
 }
 
-export const notificationService = new NotificationService();
+const notificationServiceInstance = new NotificationService();
+
+// Export individual functions to match namespace import pattern
+export const getNotifications = notificationServiceInstance.getNotifications.bind(notificationServiceInstance);
+export const markAsRead = notificationServiceInstance.markAsRead.bind(notificationServiceInstance);
+export const markAllAsRead = notificationServiceInstance.markAllAsRead.bind(notificationServiceInstance);
+export const sendBroadcast = notificationServiceInstance.sendBroadcast.bind(notificationServiceInstance);
+
+// Also export the instance for backward compatibility
+export const notificationService = notificationServiceInstance;
