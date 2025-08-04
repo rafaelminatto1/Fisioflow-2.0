@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => {
       terserOptions: {
         compress: {
           // Advanced compression options
-          drop_console: isProduction,
+          drop_console: false, // Keep console for debugging
           drop_debugger: isProduction,
           pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug'] : [],
           // Remove unused code
@@ -233,8 +233,8 @@ export default defineConfig(({ mode }) => {
     // Enhanced ESBuild configuration
     esbuild: {
       target: 'es2022',
-      // Drop console logs and debugger in production
-      drop: isProduction ? ['console', 'debugger'] : [],
+      // Drop console logs and debugger in production (keep console.error for debugging)
+      drop: isProduction ? ['debugger'] : [],
       // Minify identifiers in production
       minifyIdentifiers: isProduction,
       // Minify syntax in production

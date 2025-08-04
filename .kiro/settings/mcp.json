@@ -2,7 +2,9 @@
   "mcpServers": {
     "vercel": {
       "command": "uvx",
-      "args": ["vercel-mcp-server@latest"],
+      "args": [
+        "vercel-mcp-server@latest"
+      ],
       "env": {
         "VERCEL_TOKEN": "${VERCEL_TOKEN}",
         "VERCEL_PROJECT_ID": "${VERCEL_PROJECT_ID}",
@@ -10,13 +12,50 @@
         "MCP_LOG_LEVEL": "INFO",
         "FASTMCP_LOG_LEVEL": "ERROR"
       },
-      "disabled": false,
+      "disabled": true,
       "autoApprove": [
         "get-deployments",
         "get-deployment-status",
         "get-project-info",
         "get-analytics",
         "get-performance-metrics"
+      ]
+    },
+    "git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git@latest",
+        "--repository",
+        "."
+      ],
+      "env": {
+        "MCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "git-status",
+        "git-log",
+        "git-diff",
+        "git-branch",
+        "git_status"
+      ]
+    },
+    "sqlite": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-sqlite@latest",
+        "--db-path",
+        "./database.db"
+      ],
+      "env": {
+        "MCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list-tables",
+        "describe-table",
+        "query",
+        "list_tables"
       ]
     }
   }
