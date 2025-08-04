@@ -1,5 +1,5 @@
-import { Appointment, Therapist, AppointmentStatus } from '../types';
-import { Repeat, Clock, User, CreditCard, CheckCircle, XCircle, AlertCircle, Circle } from 'lucide-react';
+import { Appointment, Therapist, AppointmentStatus, AppointmentType } from '../types';
+import { Repeat, Clock, User, CreditCard, CheckCircle, XCircle, AlertCircle, Circle, Users } from 'lucide-react';
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -46,10 +46,21 @@ const AppointmentCard = ({
 
   const getAppointmentTypeIcon = () => {
     switch (appointment.type) {
-      case 'Avaliação': return <User className="w-3 h-3" />;
-      case 'Sessão': return <Clock className="w-3 h-3" />;
-      case 'Retorno': return <Repeat className="w-3 h-3" />;
+      case AppointmentType.Evaluation: return <User className="w-3 h-3" />;
+      case AppointmentType.Session: return <Clock className="w-3 h-3" />;
+      case AppointmentType.Return: return <Repeat className="w-3 h-3" />;
+      case AppointmentType.Group: return <Users className="w-3 h-3" />;
       default: return <Circle className="w-3 h-3" />;
+    }
+  };
+
+  const getAppointmentTypeColor = () => {
+    switch (appointment.type) {
+      case AppointmentType.Evaluation: return 'var(--appointment-evaluation)';
+      case AppointmentType.Session: return 'var(--appointment-session)';
+      case AppointmentType.Return: return 'var(--appointment-return)';
+      case AppointmentType.Group: return 'var(--appointment-group)';
+      default: return 'var(--appointment-session)';
     }
   };
 
