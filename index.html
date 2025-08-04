@@ -7,17 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0ea5e9" />
     <title>FisioFlow</title>
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     <style>
       html, body, #root {
         height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .loading-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+        background: #f8fafc;
       }
     </style>
-
-<link rel="stylesheet" href="/index.css">
-</head>
+    <link rel="stylesheet" href="/index.css">
+  </head>
   <body class="bg-slate-50 antialiased">
-    <div id="root"></div>
+    <div id="root">
+      <div class="loading-fallback">
+        <div>
+          <h2>Carregando FisioFlow...</h2>
+          <p>Se esta mensagem persistir, recarregue a página.</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Error handler for debugging
+      window.addEventListener('error', function(e) {
+        console.error('Global error:', e.error);
+        document.getElementById('root').innerHTML = 
+          '<div class="loading-fallback"><div><h2>Erro ao carregar a aplicação</h2><p>' + 
+          e.message + '</p><button onclick="location.reload()">Recarregar</button></div></div>';
+      });
+    </script>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
