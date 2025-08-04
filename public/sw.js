@@ -1,31 +1,21 @@
-const CACHE_NAME = 'fisioflow-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  // Adicione aqui os assets principais que você quer cachear
-  // '/static/css/main.css',
-  // '/static/js/bundle.js'
-];
+// Service Worker temporariamente desabilitado para debugging
+console.log('Service Worker loaded but disabled for debugging');
 
-self.addEventListener('install', event => {
+// Limpar cache existente
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          console.log('Deleting cache:', cacheName);
+          return caches.delete(cacheName);
+        })
+      );
+    })
   );
 });
 
+// Não interceptar requests - deixar passar direto
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
+  // Não fazer nada - deixar o browser lidar com as requests normalmente
 });

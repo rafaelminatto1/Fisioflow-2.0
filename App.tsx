@@ -1,9 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
-import AppRoutes from './AppRoutes';
-import { ErrorBoundaryProvider } from './components/ErrorBoundaryProvider';
 import AppDebug from './App.debug';
+
+// Lazy load components to avoid blocking the main thread
+const AppRoutes = React.lazy(() => import('./AppRoutes'));
+const ErrorBoundaryProvider = React.lazy(() => import('./components/ErrorBoundaryProvider').then(module => ({ default: module.ErrorBoundaryProvider })));
 
 const App = () => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -16,25 +18,44 @@ const App = () => {
   );
   
   useEffect(() => {
-    try {
-      // Basic initialization checks
-      console.log('🚀 FisioFlow App initializing...');
-      
-      // Check if we have access to DOM
-      if (!document.getElementById('root')) {
-        throw new Error('Root element not found');
+    const initializeApp = async () => {
+      try {
+        // Basic initialization checks
+        console.log('🚀 FisioFlow App initializing...');
+        console.log('Environment:', {
+          userAgent: navigator.userAgent,
+          location: window.location.href,
+          localStorage: typeof localStorage !== 'undefined',
+          document: typeof document !== 'undefined'
+        });
+        
+        // Check if we have access to DOM
+        if (!document.getElementById('root')) {
+          throw new Error('Root element not found');
+        }
+        
+        // Check if localStorage is available
+        localStorage.setItem('fisioflow_init_test', 'ok');
+        localStorage.removeItem('fisioflow_init_test');
+        
+        // Test if we can import React
+        if (typeof React === 'undefined') {
+          throw new Error('React is not available');
+        }
+        
+        // Add a small delay to ensure everything is loaded
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        console.log('✅ FisioFlow App initialization complete');
+        setIsInitialized(true);
+        
+      } catch (error) {
+        console.error('❌ FisioFlow App initialization failed:', error);
+        setHasError(true);
       }
-      
-      // Check if localStorage is available
-      localStorage.setItem('fisioflow_init_test', 'ok');
-      localStorage.removeItem('fisioflow_init_test');
-      
-      console.log('✅ FisioFlow App initialization complete');
-      setIsInitialized(true);
-    } catch (error) {
-      console.error('❌ FisioFlow App initialization failed:', error);
-      setHasError(true);
-    }
+    };
+    
+    initializeApp();
   }, []);
   
   if (isDebugMode) {
@@ -148,11 +169,38 @@ const App = () => {
   }
 
   return (
-    <ErrorBoundaryProvider>
-      <ReactRouterDOM.HashRouter>
-        <AppRoutes />
-      </ReactRouterDOM.HashRouter>
-    </ErrorBoundaryProvider>
+    <Suspense fallback={
+      <div style={{ 
+        padding: '20px', 
+        fontFamily: 'Arial, sans-serif',
+        backgroundColor: '#f8f9fa',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          backgroundColor: 'white',
+          padding: '40px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+        }}>
+          <h2 style={{ color: '#007bff', margin: '0 0 10px 0' }}>
+            🏥 FisioFlow
+          </h2>
+          <p style={{ color: '#666', margin: 0 }}>
+            Carregando componentes...
+          </p>
+        </div>
+      </div>
+    }>
+      <ErrorBoundaryProvider>
+        <ReactRouterDOM.HashRouter>
+          <AppRoutes />
+        </ReactRouterDOM.HashRouter>
+      </ErrorBoundaryProvider>
+    </Suspense>
   );
 };
 

@@ -68,7 +68,16 @@
 /* Utility styles */
 @layer utilities {
   .text-balance {
-    text-wrap: balance;
+    /* Fallback for browsers that don't support text-wrap */
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  /* Support text-wrap: balance where available */
+  @supports (text-wrap: balance) {
+    .text-balance {
+      text-wrap: balance;
+    }
   }
   
   .animate-in {
