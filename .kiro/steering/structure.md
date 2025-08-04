@@ -1,83 +1,65 @@
-# Project Structure
+---
+inclusion: always
+---
 
-## Root Level
-- `App.tsx` - Main application component with HashRouter
-- `AppRoutes.tsx` - Central routing configuration with role-based access
-- `types.ts` - Centralized TypeScript type definitions
-- `index.tsx` - Application entry point
-- `index.html` - HTML template
+# Project Structure & Architecture Patterns
 
-## Core Directories
+## File Organization Rules
 
-### `/components`
-React components organized by functionality:
-- **Modal Components**: `*FormModal.tsx`, `*DetailModal.tsx` patterns
-- **Card Components**: `*Card.tsx` for data display
-- **Specialized**: `InteractiveBodyMap.tsx`, `PainScale.tsx`, etc.
-- **Subdirectories**: 
-  - `ui/` - Reusable UI components
-  - `forms/` - Form-specific components
-  - `dashboard/` - Dashboard widgets
-  - `analytics/` - Analytics components
-  - `reports/` - Report components
-  - `patient-portal/` - Patient-specific components
-  - `partner-portal/` - Partner-specific components
+### Root Level Structure
+- `App.tsx` - Main app with HashRouter, never use BrowserRouter
+- `AppRoutes.tsx` - Central routing with role-based access control
+- `types.ts` - All TypeScript interfaces and types (never create separate type files)
+- Entry points: `index.tsx`, `index.html`
 
-### `/pages`
-Page components organized by portal:
-- **Root level**: Main therapist portal pages
-- `patient-portal/` - Patient portal pages
-- `partner-portal/` - Partner portal pages
+### Directory Patterns
+- `/components` - React components with clear functional grouping
+- `/pages` - Page components organized by portal (root = therapist portal)
+- `/services` - API layer with mock implementations, always async/await
+- `/hooks` - Custom hooks for business logic and state management
+- `/contexts` - React Context providers for global state
+- `/data` - Mock data files only
+- `/tests` - Mirror source structure for test organization
 
-### `/contexts`
-React Context providers:
-- `AuthContext.tsx` - Authentication state
-- `ToastContext.tsx` - Toast notifications
+## Naming Conventions (Strict)
+- **Components**: PascalCase with descriptive suffixes (`*FormModal.tsx`, `*Card.tsx`, `*Manager.tsx`)
+- **Services**: `*Service.ts` pattern, imported as `* as ServiceName`
+- **Hooks**: `use*` pattern for all custom hooks
+- **Pages**: `*Page.tsx` suffix for all page components
+- **Types**: Define in central `types.ts`, use descriptive interface names
+- **Mock Data**: `mock*` prefix for all mock data files
 
-### `/hooks`
-Custom React hooks following `use*` naming:
-- Business logic hooks (e.g., `usePatients.ts`, `useAppointments.ts`)
-- Data fetching and state management
+## Import Rules
+- Always use `@/*` path alias for project imports
+- React Router DOM: `import * as ReactRouterDOM from 'react-router-dom'`
+- Services: `import * as serviceName from '@/services/serviceName'`
+- Components: Named imports only
+- Never use default exports for services or utilities
 
-### `/services`
-API service layer with mock implementations:
-- Service files follow `*Service.ts` naming
-- Subdirectories for complex services:
-  - `ai/` - AI service implementations
-  - `ai-economica/` - Economic AI services
-  - `scheduling/` - Scheduling-related services
+## Component Architecture
+- Functional components only with TypeScript interfaces
+- Props interfaces: Define inline for simple props, export for reusable interfaces
+- State management: useState/useEffect, delegate complex logic to custom hooks
+- Error handling: Wrap components in ErrorBoundary, use try/catch in services
+- Form handling: React Hook Form with Zod validation
 
-### `/data`
-Mock data files:
-- `mockData.ts` - Core mock data
-- `mock*.ts` - Specialized mock data files
+## Service Layer Patterns
+- All services return Promises with artificial delays (simulate API calls)
+- Use async/await syntax consistently
+- Mock data should be realistic and comprehensive
+- Service functions should handle errors gracefully
+- Never mix real API calls with mock implementations
 
-### `/layouts`
-Layout components for different portals:
-- `MainLayout` - Therapist portal layout
-- `PatientPortalLayout` - Patient portal layout
-- `PartnerLayout` - Partner portal layout
+## Portal-Specific Rules
+- **Therapist Portal** (root): Full clinical functionality, admin features
+- **Patient Portal** (`/patient-portal`): Limited self-service features
+- **Partner Portal** (`/partner-portal`): External healthcare provider features
+- Each portal has dedicated layouts and components in subdirectories
 
-### `/tests`
-Test files organized by feature area
-
-## Naming Conventions
-- **Components**: PascalCase with descriptive names
-- **Files**: camelCase for utilities, PascalCase for components
-- **Services**: `*Service.ts` pattern
-- **Hooks**: `use*` pattern
-- **Types**: Defined in central `types.ts` file
-- **Mock Data**: `mock*` prefix
-
-## Import Patterns
-- Use `@/*` path alias for imports from project root
-- Import React Router DOM as `* as ReactRouterDOM`
-- Services imported with `* as serviceName` pattern
-- Components use named imports
-
-## Component Structure
-- Functional components with TypeScript interfaces
-- Props interfaces defined inline or exported
-- State management with useState/useEffect
-- Custom hooks for business logic
-- Error boundaries for error handling
+## Code Style Requirements
+- TypeScript strict mode enabled
+- Functional components with proper TypeScript typing
+- Custom hooks for business logic separation
+- Context providers for cross-component state
+- Consistent error boundary usage
+- Path aliases for clean imports

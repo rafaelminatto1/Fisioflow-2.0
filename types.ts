@@ -88,19 +88,32 @@ export enum AppointmentStatus {
   Scheduled = 'Agendado',
   Completed = 'Realizado',
   Canceled = 'Cancelado',
-  NoShow = 'Faltou'
+  NoShow = 'Faltou',
+  // Additional statuses for compatibility
+  scheduled = 'Agendado',
+  confirmed = 'Confirmado',
+  completed = 'Realizado',
+  cancelled = 'Cancelado',
+  canceled = 'Cancelado',
+  no_show = 'Faltou',
+  rescheduled = 'Reagendado'
 }
 
 export enum AppointmentType {
     Evaluation = 'Avaliação',
     Session = 'Sessão',
-    Return = 'Retorno'
+    Return = 'Retorno',
+    Group = 'Grupo'
 }
 
 export interface RecurrenceRule {
-    frequency: 'weekly';
+    frequency: 'daily' | 'weekly' | 'monthly';
     days: number[]; // 0=Sun, 1=Mon, ...
     until: string; // YYYY-MM-DD
+    interval?: number;
+    daysOfWeek?: number[];
+    endDate?: string;
+    occurrences?: number;
 }
 
 export interface Appointment {
@@ -120,6 +133,8 @@ export interface Appointment {
   recurrenceRule?: RecurrenceRule;
   sessionNumber?: number;
   totalSessions?: number;
+  location?: string;
+  notes?: string;
 }
 
 export interface SoapNote {
@@ -884,4 +899,99 @@ export interface PatientDashboard {
     theme: 'light' | 'dark';
     showMotivationalMessages: boolean;
   };
+}
+
+// --- Medical Reports Types ---
+
+export interface MedicalReport {
+  id: string;
+  patientId: string;
+  type: 'atestado' | 'laudo' | 'relatorio' | 'declaracao' | 'encaminhamento';
+  title: string;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+  issuedDate: string;
+  status: 'draft' | 'issued' | 'sent';
+  recipient?: string;
+  attachments?: Array<{ name: string; url: string; type: string }>;
+  templateUsed?: string;
+  digitalSignature?: {
+    signed: boolean;
+    signedBy: string;
+    signedAt: string;
+    certificate: string;
+  };
+}
+
+export interface ReportTemplate {
+  id: string;
+  type: string;
+  name: string;
+  content: string;
+  variables: string[];
+  isActive: boolean;
+}
+
+export interface DocumentGenerationRequest {
+  templateId: string;
+  variables: Record<string, string>;
+  patientId: string;
+  reportData: Partial<MedicalReport>;
+}
+
+export interface DocumentGenerationResult {
+  success: boolean;
+  report?: MedicalReport;
+  error?: string;
+  validationErrors?: Array<{ field: string; message: string }>;
+}
+
+// --- Documentation System Types ---
+
+export interface DocumentationSystem {
+  soapNotes: SoapNote[];
+  medicalReports: MedicalReport[];
+  templates: ReportTemplate[];
+  auditLog: DocumentAuditEntry[];
+}
+
+export interface DocumentAuditEntry {
+  id: string;
+  documentId: string;
+  documentType: 'soap_note' | 'medical_report';
+  action: 'created' | 'updated' | 'viewed' | 'signed' | 'sent' | 'deleted';
+  performedBy: string;
+  performedAt: Date;
+  details?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+export interface DocumentViewPermission {
+  documentId: string;
+  userId: string;
+  userType: 'therapist' | 'patient' | 'external';
+  permissions: ('view' | 'edit' | 'delete' | 'sign' | 'share')[];
+  expiresAt?: Date;
+}
+
+export interface DocumentShareLink {
+  id: string;
+  documentId: string;
+  documentType: 'soap_note' | 'medical_report';
+  url: string;
+  createdBy: string;
+  createdAt: Date;
+  expiresAt: Date;
+  maxViews?: number;
+  currentViews: number;
+  password?: string;
+  requiresLogin: boolean;
+  viewLog: Array<{
+    viewedAt: Date;
+    ipAddress: string;
+    userAgent: string;
+    viewerId?: string;
+  }>;
 }

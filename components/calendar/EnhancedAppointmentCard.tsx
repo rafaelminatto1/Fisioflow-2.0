@@ -1,23 +1,56 @@
-import { Appointment, Therapist, AppointmentStatus } from '../types';
-import { Repeat, Clock, User, CreditCard, CheckCircle, XCircle, AlertCircle, Circle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Appointment, Therapist, AppointmentStatus } from '../../types';
+import { 
+  Repeat, 
+  Clock, 
+  User, 
+  CreditCard, 
+  CheckCircle, 
+  XCircle, 
+  AlertCircle, 
+  Circle,
+  Move,
+  ArrowUpDown
+} from 'lucide-react';
 
-interface AppointmentCardProps {
+interface EnhancedAppointmentCardProps {
   appointment: Appointment;
   therapists: Therapist[];
   onSelect: () => void;
   isDragging?: boolean;
   isResizing?: boolean;
   showTooltip?: boolean;
+  enableDragAndDrop?: boolean;
+  enableResize?: boolean;
+  onDragStart?: (appointment: Appointment, event: React.MouseEvent) => void;
+  onResizeStart?: (appointment: Appointment, direction: 'top' | 'bottom', event: React.MouseEvent) => void;
+  dragHandleProps?: any;
+  resizeHandleProps?: {
+    top: any;
+    bottom: any;
+  };
+  style?: React.CSSProperties;
+  className?: string;
 }
 
-const AppointmentCard = ({ 
-  appointment, 
-  therapists, 
-  onSelect, 
-  isDragging = false, 
-  isResizing = false, 
-  showTooltip = true 
-}: AppointmentCardProps) => {
+const EnhancedAppointmentCard: React.FC<EnhancedAppointmentCardProps> = ({
+  appointment,
+  therapists,
+  onSelect,
+  isDragging = false,
+  isResizing = false,
+  showTooltip = true,
+  enableDragAndDrop = false,
+  enableResize = false,
+  onDragStart,
+  onResizeStart,
+  dragHandleProps,
+  resizeHandleProps,
+  style,
+  className = ''
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const startHour = appointment.startTime.getHours();
   const startMinutes = appointment.startTime.getMinutes();
   const endHour = appointment.endTime.getHours();
@@ -34,8 +67,8 @@ const AppointmentCard = ({
   };
   
   const cellHeight = getCellHeight();
-  const top = ((startHour - 7) * cellHeight) + (startMinutes * cellHeight / 60);
-  const height = (duration * cellHeight) / 60;
+  const defaultTop = ((startHour - 7) * cellHeight) + (startMinutes * cellHeight / 60);
+  const defaultHeight = (duration * cellHeight) / 60;
 
   const therapist = therapists.find(t => t.id === appointment.therapistId);
   const color = therapist?.color || 'slate';
@@ -103,34 +136,96 @@ const AppointmentCard = ({
 
   const statusStyle = statusClasses[appointment.status];
 
+  const cardStyle: React.CSSProperties = {
+    top: style?.top ?? `${defaultTop}px`,
+    height: style?.height ?? `${Math.max(defaultHeight, cellHeight * 0.8)}px`,
+    minHeight: `${cellHeight * 0.8}px`,
+    ...style
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!isDragging && !isResizing) {
+      onSelect();
+    }
+  };
+
+  const handleDragStart = (e: React.MouseEvent) => {
+    if (enableDragAndDrop && onDragStart) {
+      onDragStart(appointment, e);
+    }
+  };
+
+  const handleResizeStart = (direction: 'top' | 'bottom') => (e: React.MouseEvent) => {
+    if (enableResize && onResizeStart) {
+      onResizeStart(appointment, direction, e);
+    }
+  };
+
   // This is a TailwindCSS JIT compiler limitation workaround.
-  // The full class names must be present in the source code.
   // bg-sky-100 border-sky-500 text-sky-800 hover:bg-sky-200
   // bg-indigo-100 border-indigo-500 text-indigo-800 hover:bg-indigo-200
   // bg-slate-100 border-slate-500 text-slate-800 hover:bg-slate-200
 
   return (
     <div
-      onClick={onSelect}
+      onClick={handleCardClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`
         absolute left-1 right-1 rounded-xl cursor-pointer overflow-hidden z-10
         transition-all duration-300 ease-out
         backdrop-blur-sm border border-white/20
         ${statusStyle.bg} ${statusStyle.border} ${statusStyle.hover} ${statusStyle.shadow}
-        ${isDragging ? 'rotate-2 opacity-90' : ''}
+        ${isDragging ? 'rotate-2 opacity-90 scale-105' : ''}
         ${isResizing ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}
+        ${className}
         group
       `}
-      style={{ 
-        top: `${top}px`, 
-        height: `${Math.max(height, cellHeight * 0.8)}px`,
-        minHeight: `${cellHeight * 0.8}px`,
-        transform: isDragging ? 'scale(1.02) rotate(1deg)' : undefined
-      }}
+      style={cardStyle}
       title={showTooltip ? `${appointment.title}\nPaciente: ${appointment.patientName}\nTipo: ${appointment.type}\nHorário: ${formatTime(appointment.startTime)} - ${formatTime(appointment.endTime)}` : undefined}
+      {...dragHandleProps}
     >
       {/* Colored accent strip */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${statusStyle.accent}`} />
+      
+      {/* Drag handle (visible on hover) */}
+      {enableDragAndDrop && !isResizing && (
+        <div 
+          className="absolute top-1 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-move z-20"
+          onMouseDown={handleDragStart}
+          title="Arrastar para mover"
+        >
+          <Move className="w-3 h-3 text-current opacity-50 hover:opacity-100" />
+        </div>
+      )}
+
+      {/* Resize handles */}
+      {enableResize && !isDragging && (
+        <>
+          {/* Top resize handle */}
+          <div
+            {...resizeHandleProps?.top}
+            onMouseDown={handleResizeStart('top')}
+            className="absolute top-0 left-0 right-0 h-2 cursor-n-resize opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-blue-400/50 rounded-t-xl z-15"
+            title="Redimensionar início"
+          />
+          
+          {/* Bottom resize handle */}
+          <div
+            {...resizeHandleProps?.bottom}
+            onMouseDown={handleResizeStart('bottom')}
+            className="absolute bottom-0 left-0 right-0 h-2 cursor-s-resize opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-blue-400/50 rounded-b-xl z-15"
+            title="Redimensionar fim"
+          />
+
+          {/* Resize indicator */}
+          {isHovered && !isDragging && (
+            <div className="absolute top-1/2 right-2 transform -translate-y-1/2 opacity-60">
+              <ArrowUpDown className="w-3 h-3 text-current" />
+            </div>
+          )}
+        </>
+      )}
       
       {/* Main content */}
       <div className="p-2 sm:p-3 h-full flex flex-col justify-between relative">
@@ -168,7 +263,7 @@ const AppointmentCard = ({
             {appointment.type}
           </p>
           
-          {height > (cellHeight * 1.2) && appointment.title && (
+          {defaultHeight > (cellHeight * 1.2) && appointment.title && (
             <p className={`text-xs ${statusStyle.textSecondary} opacity-75 truncate`}>
               {appointment.title}
             </p>
@@ -176,7 +271,7 @@ const AppointmentCard = ({
         </div>
         
         {/* Value and payment status */}
-        {appointment.value && height > (cellHeight * 1.5) && (
+        {appointment.value && defaultHeight > (cellHeight * 1.5) && (
           <div className="flex items-center justify-between mt-1 pt-1 border-t border-current/10">
             <div className="flex items-center gap-1">
               <CreditCard className="w-2.5 h-2.5 opacity-60" />
@@ -192,24 +287,14 @@ const AppointmentCard = ({
         
         {/* Hover overlay with enhanced actions */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl" />
-        
-        {/* Resize handles (visible on hover) */}
-        {!isDragging && (
-          <>
-            <div className="absolute top-0 left-0 right-0 h-1 cursor-n-resize opacity-0 group-hover:opacity-100 transition-opacity bg-blue-400/50 rounded-t-xl" />
-            <div className="absolute bottom-0 left-0 right-0 h-1 cursor-s-resize opacity-0 group-hover:opacity-100 transition-opacity bg-blue-400/50 rounded-b-xl" />
-          </>
-        )}
       </div>
       
-      {/* Quick action indicators on hover */}
-      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-1">
-        <div className="w-1.5 h-1.5 rounded-full bg-white/70 backdrop-blur-sm" />
-        <div className="w-1.5 h-1.5 rounded-full bg-white/70 backdrop-blur-sm" />
-        <div className="w-1.5 h-1.5 rounded-full bg-white/70 backdrop-blur-sm" />
-      </div>
+      {/* Interaction state indicators */}
+      {(isDragging || isResizing) && (
+        <div className="absolute inset-0 bg-blue-500/10 rounded-xl pointer-events-none" />
+      )}
     </div>
   );
 };
 
-export default AppointmentCard;
+export default EnhancedAppointmentCard;

@@ -1,47 +1,69 @@
-# Technology Stack
+---
+inclusion: always
+---
 
-## Frontend Framework
-- **React 19.1.1** with TypeScript
-- **Vite** as build tool and development server
-- **React Router DOM 7.7.1** for routing with HashRouter
+# Technology Stack & Development Guidelines
 
-## Key Libraries
-- **UI Components**: Lucide React for icons
-- **Charts**: Recharts for data visualization
-- **Forms**: React Hook Form with Zod validation and Hookform Resolvers
-- **AI Integration**: Google GenAI for Gemini API integration
-- **Testing**: Vitest, Testing Library React, Jest DOM
+## Core Technologies
+- **React 19.1.1** with TypeScript 5.8.2 (ES2022 target)
+- **Vite** for build tooling and development server
+- **React Router DOM 7.7.1** - ALWAYS use HashRouter, never BrowserRouter
+- **Path aliases**: `@/*` maps to project root - use consistently
 
-## Development Setup
-- **TypeScript 5.8.2** with ES2022 target
-- **Path aliases**: `@/*` maps to project root
-- **Module system**: ESNext with bundler resolution
-- **JSX**: React JSX transform
+## Essential Libraries
+- **Forms**: React Hook Form + Zod validation + Hookform Resolvers
+- **Icons**: Lucide React only
+- **Charts**: Recharts for all data visualization
+- **AI**: Google GenAI (Gemini API via `GEMINI_API_KEY` env var)
+- **Testing**: Vitest + Testing Library React + Jest DOM
 
-## Environment Configuration
-- Environment variables loaded via Vite's loadEnv
-- Gemini API key configured through `GEMINI_API_KEY` env var
-- Process.env variables defined in vite.config.ts
+## Critical Development Rules
 
-## Common Commands
-```bash
-# Development
-npm run dev          # Start development server
+### Import Patterns (Strict)
+```typescript
+// Services - always namespace import
+import * as PatientService from '@/services/patientService'
 
-# Production
-npm run build        # Build for production
-npm run preview      # Preview production build
+// React Router - always namespace import
+import * as ReactRouterDOM from 'react-router-dom'
+
+// Components - named imports only
+import { Button, Modal } from '@/components/ui'
+
+// Never use default exports for services or utilities
 ```
 
-## Architecture Patterns
-- **Service Layer**: Separate service files for API interactions with mock data
-- **Custom Hooks**: Business logic encapsulated in custom hooks (usePatients, useAppointments, etc.)
-- **Context Providers**: Global state management (AuthContext, ToastContext)
-- **Protected Routes**: Role-based access control with ProtectedRoute component
-- **Layout Components**: Dedicated layouts for different user portals
+### Service Layer Requirements
+- All services MUST be async/await with artificial delays
+- Mock data implementations only - no real API calls
+- Services return Promises, handle errors gracefully
+- Import pattern: `import * as ServiceName from '@/services/serviceName'`
 
-## Code Organization
-- Services use async/await with artificial delays to simulate API calls
-- Mock data stored in `/data` directory
-- Type definitions centralized in `types.ts`
-- Components follow functional component pattern with TypeScript interfaces
+### TypeScript Conventions
+- All types in central `types.ts` file - never create separate type files
+- Functional components only with proper TypeScript interfaces
+- Props interfaces: inline for simple, exported for reusable
+- Strict mode enabled - handle all type errors
+
+### State Management
+- Custom hooks for business logic (usePatients, useAppointments, etc.)
+- Context providers for global state (AuthContext, ToastContext, ModalContext)
+- useState/useEffect for component state
+- Delegate complex logic to custom hooks
+
+### Error Handling
+- Wrap components in ErrorBoundary
+- Try/catch in all service functions
+- Toast notifications for user feedback
+- Graceful degradation for failed operations
+
+### Environment & Build
+- Environment variables via Vite's loadEnv
+- Process.env variables defined in vite.config.ts
+- Commands: `npm run dev`, `npm run build`, `npm run preview`
+
+## Architecture Enforcement
+- **Service Layer**: Separate files with mock implementations
+- **Protected Routes**: Role-based access with ProtectedRoute component
+- **Portal Layouts**: Dedicated layouts for therapist/patient/partner portals
+- **Form Validation**: React Hook Form + Zod schemas consistently

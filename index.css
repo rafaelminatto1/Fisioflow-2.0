@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Agenda Design Tokens */
+@import './styles/agenda-design-tokens.css';
+
 /* Base styles */
 @layer base {
   html {

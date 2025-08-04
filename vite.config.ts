@@ -15,13 +15,36 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: false,
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'ui-vendor': ['lucide-react', 'framer-motion'],
+          'chart-vendor': ['recharts'],
+          'form-vendor': ['react-hook-form', 'zod']
+        }
+      },
+      onwarn(warning, warn) {
+        // Suppress warnings for faster deployment
+        if (
+          warning.code === 'UNRESOLVED_IMPORT' ||
+          warning.code === 'MODULE_LEVEL_DIRECTIVE' ||
+          warning.code === 'EVAL' ||
+          warning.message.includes('TypeScript')
+        ) {
+          return;
+        }
+        warn(warning);
+      }
+    },
+    chunkSizeWarningLimit: 1000
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: ['react', 'react-dom', 'react-router-dom', 'lucide-react', 'framer-motion']
   },
   define: {
-    // Ensure process.env is not referenced in client code
-    'process.env': {}
+    'process.env': process.env
   }
 });

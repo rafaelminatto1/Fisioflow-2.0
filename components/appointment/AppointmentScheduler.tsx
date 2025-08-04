@@ -301,7 +301,11 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({
         endTime,
         location: data.location,
         notes: data.notes,
-        recurrenceRule: data.isRecurring ? data.recurrenceRule : undefined
+        recurrenceRule: data.isRecurring && data.recurrenceRule ? {
+          ...data.recurrenceRule,
+          days: data.recurrenceRule.daysOfWeek || [],
+          until: data.recurrenceRule.endDate || ''
+        } : undefined
       };
 
       await onSave(appointment);
@@ -516,7 +520,10 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({
               control={control}
               render={({ field }) => (
                 <input
-                  {...field}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
                   type="checkbox"
                   checked={field.value}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -524,7 +531,7 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({
               )}
             />
             <span className="text-sm font-medium text-gray-700">Enviar lembrete</span>
-          </Controller>
+          </label>
           
           {watchedValues.sendReminder && (
             <Controller
@@ -554,7 +561,10 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({
               control={control}
               render={({ field }) => (
                 <input
-                  {...field}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
                   type="checkbox"
                   checked={field.value}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
