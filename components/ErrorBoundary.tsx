@@ -49,40 +49,27 @@ class ErrorBoundary extends Component<Props, State> {
 
   private reportErrorToService = async (error: Error, errorInfo: ErrorInfo) => {
     try {
-      const { default: errorLoggingService } = await import('../services/errorLoggingService');
-      
-      await errorLoggingService.logError(error, {
+      // Simple fallback to localStorage
+      const errorLog = {
+        timestamp: new Date().toISOString(),
+        error: error.message,
+        stack: error.stack,
+        url: window.location.href,
         level: this.props.level || 'component',
-        context: `error_boundary:${this.props.level || 'component'}`,
-        componentStack: errorInfo.componentStack,
         retryCount: this.state.retryCount,
-      });
-    } catch (loggingError) {
-      console.error('Failed to log error through error logging service:', loggingError);
+      };
       
-      // Ultimate fallback to localStorage
-      try {
-        const errorLog = {
-          timestamp: new Date().toISOString(),
-          error: error.message,
-          stack: error.stack,
-          url: window.location.href,
-          level: this.props.level || 'component',
-          retryCount: this.state.retryCount,
-        };
-        
-        const existingLogs = JSON.parse(localStorage.getItem('fisioflow_error_fallback') || '[]');
-        existingLogs.push(errorLog);
-        
-        // Keep only last 50 errors
-        if (existingLogs.length > 50) {
-          existingLogs.splice(0, existingLogs.length - 50);
-        }
-        
-        localStorage.setItem('fisioflow_error_fallback', JSON.stringify(existingLogs));
-      } catch (storageError) {
-        console.error('Complete error logging failure:', storageError);
+      const existingLogs = JSON.parse(localStorage.getItem('fisioflow_error_fallback') || '[]');
+      existingLogs.push(errorLog);
+      
+      // Keep only last 50 errors
+      if (existingLogs.length > 50) {
+        existingLogs.splice(0, existingLogs.length - 50);
       }
+      
+      localStorage.setItem('fisioflow_error_fallback', JSON.stringify(existingLogs));
+    } catch (storageError) {
+      console.error('Complete error logging failure:', storageError);
     }
   };
 
