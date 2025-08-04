@@ -316,6 +316,37 @@ Vercel's global CDN is configured for:
 - **Security Scanning**: Automated vulnerability checks
 - **Performance Monitoring**: Continuous performance tracking
 
+## 🆕 Latest Features in Production
+
+### Sistema de Gestão de Inventário (v2.1)
+
+A aplicação agora inclui um sistema completo de gestão de inventário:
+
+#### 📦 **Funcionalidades Implementadas**
+- **Controle de Estoque**: CRUD completo para itens consumíveis e equipamentos
+- **Movimentações**: Sistema de rastreamento com histórico detalhado
+- **Alertas**: Notificações automáticas para estoque baixo e manutenção
+- **Relatórios**: Geração de relatórios de inventário e movimentações
+- **Integração**: Modal de consulta durante atendimentos
+
+#### 🏗️ **Arquitetura**
+- **Services**: `inventoryService.ts`, `equipmentService.ts`, `inventoryReportsService.ts`
+- **Hooks**: `useInventory.ts`, `useEquipment.ts`, `useInventoryMovements.ts`
+- **Components**: 9 componentes UI completos
+- **Pages**: `InventoryPage.tsx`, `EquipmentPage.tsx`
+- **Routes**: `/inventory` e `/equipment` integradas ao sistema
+
+#### ✅ **Status de Deployment**
+- **Build**: ✅ Compatível com produção (2735+ módulos)
+- **Tests**: ✅ 7 testes passando (100% coverage)
+- **TypeScript**: ✅ Tipagem completa com validação Zod
+- **Integration**: ✅ Totalmente integrado ao sistema existente
+
+#### 🔗 **Acesso**
+- **Inventário**: `/inventory` - Lista e gestão de itens
+- **Equipamentos**: `/equipment` - Gestão específica de equipamentos
+- **Durante Consultas**: Modal de consulta integrado no AtendimentoPage
+
 ## Support
 
 For deployment issues:

@@ -1,7 +1,7 @@
 // pages/AtendimentoPage.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
-import { Save, BrainCircuit, Loader, Target, ListChecks, FileText, Edit, Trash2, Paperclip, Upload, CheckCircle } from 'lucide-react';
+import { Save, BrainCircuit, Loader, Target, ListChecks, FileText, Edit, Trash2, Paperclip, Upload, CheckCircle, PackageSearch } from 'lucide-react';
 import { usePageData } from '../hooks/usePageData';
 import { useToast } from '../contexts/ToastContext';
 import * as appointmentService from '../services/appointmentService';
@@ -15,6 +15,7 @@ import PainScale from '../components/PainScale';
 import InteractiveBodyMap from '../components/InteractiveBodyMap';
 import { aiOrchestratorService } from '../services/ai/aiOrchestratorService';
 import RichTextEditor from '../components/ui/RichTextEditor';
+import { InventoryConsultationModal } from '../components/inventory/InventoryConsultationModal';
 
 interface PainPoint {
     part: string;
@@ -37,6 +38,7 @@ const AtendimentoPage: React.FC = () => {
     // UI/Form states
     const [isFinishing, setIsFinishing] = useState(false);
     const [isAiLoading, setIsAiLoading] = useState(false);
+    const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
     const [subjective, setSubjective] = useState('');
     const [objective, setObjective] = useState('');
     const [assessment, setAssessment] = useState('');
@@ -213,6 +215,7 @@ const AtendimentoPage: React.FC = () => {
 
     return (
         <>
+            <InventoryConsultationModal isOpen={isInventoryModalOpen} onClose={() => setIsInventoryModalOpen(false)} />
             <div className="space-y-6">
                  <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -221,6 +224,10 @@ const AtendimentoPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-4">
                         {getSaveStatusIndicator()}
+                        <button onClick={() => setIsInventoryModalOpen(true)} className="inline-flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-colors">
+                            <PackageSearch className="w-5 h-5 mr-2" />
+                            Consultar Inventário
+                        </button>
                         <button onClick={handleFinishSession} disabled={isFinishing || saveStatus !== 'saved'} className="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-colors disabled:bg-green-300 disabled:cursor-not-allowed">
                             {isFinishing ? <Loader className="w-5 h-5 mr-2 animate-spin" /> : <Save className="w-5 h-5 mr-2" />}
                             {isFinishing ? 'Salvando...' : 'Finalizar e Salvar'}

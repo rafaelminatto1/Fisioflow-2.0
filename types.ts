@@ -901,6 +901,62 @@ export interface PatientDashboard {
   };
 }
 
+// --- Inventory Management Types ---
+
+export enum InventoryCategory {
+  Consumable = 'Consumível',
+  Equipment = 'Equipamento',
+  OfficeSupply = 'Material de Escritório',
+}
+
+export enum InventoryStatus {
+  InStock = 'Em Estoque',
+  LowStock = 'Estoque Baixo',
+  OutOfStock = 'Fora de Estoque',
+  InMaintenance = 'Em Manutenção',
+  Decommissioned = 'Descomissionado',
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  category: InventoryCategory;
+  quantity: number;
+  minQuantity: number;
+  status: InventoryStatus;
+  supplier?: string;
+  lastReorderDate?: string;
+  location: string;
+}
+
+export interface Equipment extends InventoryItem {
+  serialNumber: string;
+  purchaseDate: string;
+  warrantyExpires: string;
+  lastMaintenanceDate?: string;
+  nextMaintenanceDate?: string;
+  maintenanceCost?: number;
+  condition: 'new' | 'used' | 'needs_repair';
+}
+
+export enum MovementType {
+  Entry = 'Entrada',
+  Exit = 'Saída',
+  Adjustment = 'Ajuste',
+  Initial = 'Inicial',
+}
+
+export interface InventoryMovement {
+  id: string;
+  itemId: string;
+  type: MovementType;
+  quantity: number;
+  date: string;
+  userId: string;
+  reason?: string;
+  notes?: string;
+}
+
 // --- Medical Reports Types ---
 
 export interface MedicalReport {

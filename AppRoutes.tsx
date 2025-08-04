@@ -34,6 +34,8 @@ import AiSettingsPage from './pages/AiSettingsPage';
 import KanbanPage from './pages/KanbanPage';
 import NotificationCenterPage from './pages/NotificationCenterPage';
 import AtendimentoPage from './pages/AtendimentoPage';
+import InventoryPage from './pages/InventoryPage';
+import EquipmentPage from './pages/EquipmentPage';
 
 // Patient Portal Imports
 import PatientPortalLayout from './layouts/PatientPortalLayout';
@@ -138,13 +140,16 @@ const AppRoutes = () => {
                     <ReactRouterDOM.Route path="/knowledge-base" element={<KnowledgeBasePage />} />
                     <ReactRouterDOM.Route path="/ia-economica" element={<EconomicPage />} />
                     <ReactRouterDOM.Route path="/ai-settings" element={<AiSettingsPage />} />
-                    <ReactRouterDOM.Route path="/atendimento/:appointmentId" element={<AtendimentoPage />} />
+                    '''                    <ReactRouterDOM.Route path="/atendimento/:appointmentId" element={<AtendimentoPage />} />
+                    <ReactRouterDOM.Route path="/inventory" element={<InventoryPage />} />
+                    <ReactRouterDOM.Route path="/equipment" element={<EquipmentPage />} />
                     <ReactRouterDOM.Route path="*" element={<ReactRouterDOM.Navigate to="/dashboard" replace />} />
                   </ReactRouterDOM.Routes>
                 </MainLayout>
               </ProtectedRoute>
             } 
           />
+''
 
         </ReactRouterDOM.Routes>
     );

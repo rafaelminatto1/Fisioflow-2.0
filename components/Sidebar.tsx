@@ -2,38 +2,83 @@
 
 import { useState } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
-import { LayoutGrid, Users, Calendar, Stethoscope, ChevronLeft, ChevronRight, BarChart3, ShieldCheck, Cog, Library, AreaChart, LogOut, FilePlus, FileClock, Dumbbell, AlertTriangle, Activity, Users2, Mail, BookMarked, ClipboardList, PieChart, DollarSign, SlidersHorizontal, FilePenLine, Bell } from 'lucide-react';
+import { LayoutGrid, Users, Calendar, Stethoscope, ChevronLeft, ChevronRight, BarChart3, ShieldCheck, Cog, Library, AreaChart, LogOut, FilePlus, FileClock, Dumbbell, AlertTriangle, Activity, Users2, Mail, BookMarked, ClipboardList, PieChart, DollarSign, SlidersHorizontal, FilePenLine, Bell, Package, Wrench } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
 
-const NavLink = ({ to, icon: Icon, label, isCollapsed, badgeCount }: { to: string, icon: React.ElementType, label: string, isCollapsed: boolean, badgeCount?: number }) => (
-    <ReactRouterDOM.NavLink
-      to={to}
-      className={({ isActive }) =>
-        `flex items-center p-3 rounded-lg transition-colors duration-200 ${
-          isActive
-            ? 'bg-slate-800 text-sky-400 font-semibold'
-            : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-        } ${isCollapsed ? 'justify-center' : ''}`
-      }
-      title={isCollapsed ? label : undefined}
-    >
-        <div className="relative w-full flex items-center">
-            <Icon className={`w-6 h-6 shrink-0 ${isCollapsed ? '' : 'mr-3'}`} />
-            {!isCollapsed && <span className="truncate flex-1">{label}</span>}
-            
-            {!isCollapsed && badgeCount && badgeCount > 0 ? (
-                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
-                    {badgeCount > 9 ? '9+' : badgeCount}
-                </span>
-            ) : null}
+const NavLink = ({ to, icon: Icon, label, isCollapsed, badgeCount, subItems }: { to: string, icon: React.ElementType, label: string, isCollapsed: boolean, badgeCount?: number, subItems?: { to: string, label: string }[] }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const location = ReactRouterDOM.useLocation();
 
-             {isCollapsed && badgeCount && badgeCount > 0 ? (
-                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 ring-2 ring-slate-900"></span>
-            ) : null}
-        </div>
-    </ReactRouterDOM.NavLink>
-);
+    const isParentActive = subItems ? subItems.some(item => location.pathname.startsWith(item.to)) : false;
+
+    if (subItems) {
+        return (
+            <div>
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`flex items-center p-3 rounded-lg transition-colors duration-200 w-full ${
+                        isParentActive
+                            ? 'bg-slate-800 text-sky-400 font-semibold'
+                            : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                    } ${isCollapsed ? 'justify-center' : ''}`}
+                >
+                    <Icon className={`w-6 h-6 shrink-0 ${isCollapsed ? '' : 'mr-3'}`} />
+                    {!isCollapsed && <span className="truncate flex-1 text-left">{label}</span>}
+                    {!isCollapsed && <ChevronRight className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-90' : ''}`} />}
+                </button>
+                {!isCollapsed && isOpen && (
+                    <div className="pl-6 mt-1 space-y-1">
+                        {subItems.map(item => (
+                            <ReactRouterDOM.NavLink
+                                key={item.to}
+                                to={item.to}
+                                className={({ isActive }) =>
+                                    `flex items-center p-2 rounded-lg transition-colors duration-200 text-sm ${
+                                    isActive
+                                        ? 'bg-slate-700 text-sky-300 font-semibold'
+                                        : 'text-slate-400 hover:bg-slate-700 hover:text-white'
+                                    }`
+                                }
+                            >
+                                {item.label}
+                            </ReactRouterDOM.NavLink>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <ReactRouterDOM.NavLink
+          to={to}
+          className={({ isActive }) =>
+            `flex items-center p-3 rounded-lg transition-colors duration-200 ${
+              isActive
+                ? 'bg-slate-800 text-sky-400 font-semibold'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+            } ${isCollapsed ? 'justify-center' : ''}`
+          }
+          title={isCollapsed ? label : undefined}
+        >
+            <div className="relative w-full flex items-center">
+                <Icon className={`w-6 h-6 shrink-0 ${isCollapsed ? '' : 'mr-3'}`} />
+                {!isCollapsed && <span className="truncate flex-1">{label}</span>}
+                
+                {!isCollapsed && badgeCount && badgeCount > 0 ? (
+                    <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                        {badgeCount > 9 ? '9+' : badgeCount}
+                    </span>
+                ) : null}
+
+                 {isCollapsed && badgeCount && badgeCount > 0 ? (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 ring-2 ring-slate-900"></span>
+                ) : null}
+            </div>
+        </ReactRouterDOM.NavLink>
+    );
+};''
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -66,6 +111,15 @@ const Sidebar: React.FC = () => {
 
   const bottomNavItems = [
     { to: '/financials', icon: DollarSign, label: 'Financeiro' },
+    { 
+      to: '/inventory', 
+      icon: Package, 
+      label: 'Inventário', 
+      subItems: [
+        { to: '/inventory', label: 'Itens' },
+        { to: '/equipment', label: 'Equipamentos' },
+      ]
+    },
     { to: '/reports', icon: BarChart3, label: 'Relatórios' },
     { to: '/knowledge-base', icon: Library, label: 'Base de Conhecimento' },
     { to: '/ia-economica', icon: AreaChart, label: 'IA Econômica' },

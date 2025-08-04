@@ -27,6 +27,7 @@ Fisioflow 2.0 é uma aplicação React completa para gestão de clínicas de fis
   /dashboard/         # Componentes do dashboard principal
   /error/             # Error boundaries e fallbacks
   /forms/             # Formulários especializados
+  /inventory/         # Sistema de gestão de inventário
   /partner-portal/    # Componentes do portal de parceiros
   /patient-portal/    # Componentes do portal de pacientes
   /reports/           # Componentes de relatórios
@@ -39,8 +40,13 @@ Fisioflow 2.0 é uma aplicação React completa para gestão de clínicas de fis
   coding-standards.md      # Padrões de desenvolvimento
   deployment-troubleshooting.md  # Guia de troubleshooting
 /hooks/               # Custom hooks
+  useInventory.ts     # Hook para gestão de itens de inventário
+  useEquipment.ts     # Hook para gestão de equipamentos
+  useInventoryMovements.ts  # Hook para movimentações de estoque
 /layouts/             # Layouts principais dos portais
 /pages/               # Páginas da aplicação
+  InventoryPage.tsx   # Página principal de inventário
+  EquipmentPage.tsx   # Página de gestão de equipamentos
 /services/            # Lógica de negócio e APIs
   /ai/                # Serviços de IA/orchestração
   /ai-economica/      # Sistema de IA econômica completo
@@ -109,6 +115,11 @@ Fisioflow 2.0 é uma aplicação React completa para gestão de clínicas de fis
 - `partnershipService.ts` - Gestão de parcerias
 - `voucherService.ts` - Sistema de vouchers
 
+### Sistema de Inventário
+- `inventoryService.ts` - Operações CRUD e gestão de estoque
+- `equipmentService.ts` - Gestão específica de equipamentos
+- `inventoryReportsService.ts` - Relatórios de inventário
+
 ## Tipos TypeScript Principais
 
 ### Core Types
@@ -137,6 +148,37 @@ interface Appointment {
   type: AppointmentType;
   status: AppointmentStatus;
   recurrenceRule?: RecurrenceRule;
+}
+
+// Inventory Management Types
+interface InventoryItem {
+  id: string;
+  name: string;
+  category: InventoryCategory;
+  quantity: number;
+  minQuantity: number;
+  status: InventoryStatus;
+  supplier?: string;
+  location: string;
+}
+
+interface Equipment extends InventoryItem {
+  serialNumber: string;
+  purchaseDate: string;
+  warrantyExpires: string;
+  lastMaintenanceDate?: string;
+  nextMaintenanceDate?: string;
+  condition: 'new' | 'used' | 'needs_repair';
+}
+
+interface InventoryMovement {
+  id: string;
+  itemId: string;
+  type: MovementType;
+  quantity: number;
+  date: string;
+  userId: string;
+  reason?: string;
 }
 ```
 
@@ -204,6 +246,16 @@ interface Appointment {
 - **Monitoramento de IA**: Uso por fonte, economia em tempo real
 - **Performance Tracking**: Métricas de Core Web Vitals
 
+### 9. Sistema de Gestão de Inventário
+- **Controle de Estoque**: Cadastro completo de itens consumíveis e equipamentos
+- **Movimentações**: Registro de entradas, saídas e ajustes com histórico detalhado
+- **Alertas Inteligentes**: Notificações automáticas para estoque baixo e reposição
+- **Gestão de Equipamentos**: Controle de manutenção, garantia e condições
+- **Relatórios**: Relatórios de nível de estoque e histórico de movimentações
+- **Integração com Atendimento**: Consulta de inventário durante consultas
+- **Categorização**: Organização por categorias (Consumível, Equipamento, Material de Escritório)
+- **Localização**: Controle de localização física dos itens na clínica
+
 ## Comandos de Desenvolvimento
 
 ```bash
@@ -261,6 +313,16 @@ npm run preview  # Preview da build
 - ✅ **Error Boundaries**: Sistema hierárquico de recuperação
 - ✅ **Performance**: Lazy loading, code splitting, asset optimization
 - ✅ **Testes de Deploy**: Validação completa de build e integração
+
+### Sistema de Gestão de Inventário (100% Implementado)
+- ✅ **Arquitetura Completa**: Serviços, hooks, componentes e páginas
+- ✅ **Gestão de Estoque**: CRUD completo para itens e equipamentos
+- ✅ **Movimentações**: Sistema de registro com histórico detalhado
+- ✅ **Alertas e Monitoramento**: Notificações de estoque baixo e manutenção
+- ✅ **Relatórios**: Sistema completo de relatórios de inventário
+- ✅ **Integração**: Modal de consulta durante atendimentos
+- ✅ **Testes**: Cobertura completa de testes unitários e de componentes
+- ✅ **TypeScript**: Tipagem completa com schemas de validação Zod
 
 ## 🚀 Deployment em Produção
 
