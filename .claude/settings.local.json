@@ -34,7 +34,8 @@
       "Bash(vercel:*)",
       "WebFetch(domain:fisioflow-20-lv49zs02a-rafael-minattos-projects.vercel.app)",
       "Bash(sed:*)",
-      "WebFetch(domain:fisioflow-20-9aqi47qvn-rafael-minattos-projects.vercel.app)"
+      "WebFetch(domain:fisioflow-20-9aqi47qvn-rafael-minattos-projects.vercel.app)",
+      "WebFetch(domain:fisioflow-20-jqrivt8vk-rafael-minattos-projects.vercel.app)"
     ],
     "deny": []
   }
