@@ -5,8 +5,8 @@ import { ErrorBoundaryProvider } from './components/ErrorBoundaryProvider';
 import AppDebug from './App.debug';
 
 const App = () => {
-  // Debug mode for troubleshooting white screen
-  const isDebugMode = import.meta.env.DEV && (
+  // Debug mode for troubleshooting white screen - works in production too
+  const isDebugMode = (
     window.location.search.includes('debug=true') || 
     localStorage.getItem('fisioflow_debug') === 'true'
   );
