@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "vercel": {
+      "command": "uvx",
+      "args": ["vercel-mcp-server@latest"],
+      "env": {
+        "VERCEL_TOKEN": "${VERCEL_TOKEN}",
+        "VERCEL_PROJECT_ID": "${VERCEL_PROJECT_ID}",
+        "VERCEL_TEAM_ID": "${VERCEL_TEAM_ID}",
+        "MCP_LOG_LEVEL": "INFO",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "get-deployments",
+        "get-deployment-status",
+        "get-project-info",
+        "get-analytics",
+        "get-performance-metrics"
+      ]
+    }
+  }
+}

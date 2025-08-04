@@ -17,33 +17,62 @@ export const ErrorBoundaryProvider = ({ children, onError }: ErrorBoundaryProvid
   const reportError = useCallback((error: Error, context?: string, showToast = true) => {
     console.error(`Error in ${context || 'unknown context'}:`, error);
     
-    // Show user-friendly toast notification
+    // Show user-friendly notification (simplified approach)
     if (showToast && typeof window !== 'undefined') {
-      // Dynamically import toast to avoid circular dependencies
-      import('../contexts/ToastContext').then(({ useToast }) => {
-        // This won't work directly since useToast is a hook
-        // We'll handle this in the component level instead
-      }).catch(() => {
-        // Fallback to console if toast is not available
-        console.warn('Toast system not available for error notification');
-      });
+      // Create a simple notification without external dependencies
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ef4444;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+      `;
+      notification.textContent = `Erro: ${error.message}`;
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 5000);
     }
     
     if (onError) {
       onError(error, { context });
     }
 
-    // Send to error logging service
-    import('../services/errorLoggingService').then(({ default: errorLoggingService }) => {
-      errorLoggingService.logError(error, {
-        level: 'component',
+    // Send to error logging service (safer approach without dynamic imports)
+    try {
+      // Use a simplified logging approach to avoid import issues
+      const errorData = {
+        message: error.message,
+        stack: error.stack,
         context: context || 'manual_report',
-      }).catch((loggingError) => {
-        console.error('Failed to log error:', loggingError);
-      });
-    }).catch(() => {
-      console.warn('Error logging service not available');
-    });
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown'
+      };
+      
+      // Store in localStorage as fallback
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const errors = JSON.parse(localStorage.getItem('fisioflow_errors') || '[]');
+        errors.push(errorData);
+        // Keep only last 50 errors
+        if (errors.length > 50) errors.splice(0, errors.length - 50);
+        localStorage.setItem('fisioflow_errors', JSON.stringify(errors));
+      }
+    } catch (loggingError) {
+      console.warn('Failed to store error locally:', loggingError);
+    }
   }, [onError]);
 
   const handleAsyncError = useCallback(async (promise: Promise<any>, context?: string) => {
