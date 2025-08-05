@@ -51,7 +51,9 @@
       "WebFetch(domain:fisioflow-20-ld48id4vc-rafael-minattos-projects.vercel.app)",
       "Bash(VITE_SKIP_TYPESCRIPT=true npm run build)",
       "Bash(npm --version)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "WebFetch(domain:fisioflow-20-ha6uf08sg-rafael-minattos-projects.vercel.app)",
+      "Bash(npx create-vite:*)"
     ],
     "deny": []
   }

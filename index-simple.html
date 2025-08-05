@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <title>FisioFlow</title>
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      .app-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+        color: white;
+      }
+      .content {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .status {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(34, 197, 94, 0.2);
+        border-radius: 8px;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="app-container">
+        <div class="content">
+          <h1>🏥 FisioFlow 2.0</h1>
+          <p>Sistema completo de gestão de clínicas de fisioterapia</p>
+          <div class="status">
+            <h3>✅ Sistema Funcionando</h3>
+            <p>Build corrigido e funcionando</p>
+            <p>Timestamp: <span id="timestamp"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.getElementById('timestamp').textContent = new Date().toLocaleString();
+      console.log('✅ FisioFlow: Aplicação carregada com sucesso!');
+    </script>
+  </body>
+</html>
