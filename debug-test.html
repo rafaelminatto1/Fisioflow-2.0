@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FisioFlow Debug</title>
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .debug-info {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 9999;
+        max-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-info" id="debug">
+      <div>🔍 Debug Info:</div>
+      <div id="debug-content">Initializing...</div>
+    </div>
+    
+    <div id="root">
+      <div style="
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        height: 100vh; 
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        font-family: system-ui, sans-serif;
+      ">
+        <div style="text-align: center;">
+          <h1>🧪 Debug Mode</h1>
+          <p>Testing React Loading...</p>
+          <div id="status">Waiting for React...</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/assets/index-BKO5RuGo.js"></script>
+    
+    <script>
+      const debug = document.getElementById('debug-content');
+      const status = document.getElementById('status');
+      let logs = [];
+      
+      function addLog(msg) {
+        logs.push(`${new Date().toLocaleTimeString()}: ${msg}`);
+        if (logs.length > 8) logs.shift();
+        debug.innerHTML = logs.join('<br>');
+        console.log('DEBUG:', msg);
+      }
+      
+      // Override console.log to capture React logs
+      const originalLog = console.log;
+      console.log = function(...args) {
+        if (args[0] && args[0].includes && args[0].includes('FisioFlow')) {
+          status.textContent = args.join(' ');
+          addLog(args.join(' '));
+        }
+        return originalLog.apply(console, args);
+      };
+      
+      // Override console.error to capture React errors
+      const originalError = console.error;
+      console.error = function(...args) {
+        addLog('ERROR: ' + args.join(' '));
+        status.textContent = 'ERROR: ' + args[0];
+        return originalError.apply(console, args);
+      };
+      
+      addLog('Debug page initialized');
+      addLog('Root element exists: ' + !!document.getElementById('root'));
+      addLog('JavaScript loading...');
+      
+      // Check if React loaded after 5 seconds
+      setTimeout(() => {
+        const rootContent = document.getElementById('root').innerHTML;
+        if (rootContent.includes('Debug Mode')) {
+          addLog('React did not load - fallback still showing');
+          status.textContent = 'React failed to load';
+        } else {
+          addLog('React seems to have loaded');
+          status.textContent = 'React loaded successfully';
+        }
+      }, 5000);
+      
+      window.addEventListener('error', function(e) {
+        addLog('Window Error: ' + e.message);
+        status.textContent = 'Error: ' + e.message;
+      });
+    </script>
+  </body>
+</html>
