@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - FisioFlow</title>
+</head>
+<body>
+    <h1>FisioFlow Debug Page</h1>
+    <p>If you can see this, the static files are being served correctly.</p>
+    <p>Current time: <span id="time"></span></p>
+    
+    <h2>Environment Check</h2>
+    <ul>
+        <li>Location: <span id="location"></span></li>
+        <li>User Agent: <span id="userAgent"></span></li>
+        <li>Console errors will be logged below:</li>
+    </ul>
+    
+    <div id="errors" style="background: #ffe6e6; padding: 10px; margin: 10px 0;"></div>
+    
+    <script>
+        document.getElementById('time').textContent = new Date().toISOString();
+        document.getElementById('location').textContent = window.location.href;
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        
+        // Capture console errors
+        window.addEventListener('error', function(e) {
+            const errorDiv = document.getElementById('errors');
+            errorDiv.innerHTML += '<p>Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</p>';
+        });
+        
+        console.log('Debug page loaded successfully');
+    </script>
+</body>
+</html>
