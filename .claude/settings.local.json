@@ -41,7 +41,17 @@
       "Bash(npm cache clean:*)",
       "Bash(npm test:*)",
       "Bash(npx vitest:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npx @anthropic-ai/mcp-vercel-cli:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(npx -y @nganiet/mcp-vercel:*)",
+      "Bash(git clone:*)",
+      "WebFetch(domain:vercel.com)",
+      "Bash(cat:*)",
+      "WebFetch(domain:fisioflow-20-ld48id4vc-rafael-minattos-projects.vercel.app)",
+      "Bash(VITE_SKIP_TYPESCRIPT=true npm run build)",
+      "Bash(npm --version)",
+      "Bash(npx vite:*)"
     ],
     "deny": []
   }

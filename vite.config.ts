@@ -101,8 +101,10 @@ export default defineConfig(({ mode }) => {
         // External dependencies (for library builds) - ensure nothing is externalized
         external: [],
         
-        // Input configuration - simplified
-        input: path.resolve(__dirname, 'index.html'),
+        // Input configuration - HTML entry point with TypeScript
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+        },
         
         output: {
           // Simplified and consistent chunk file naming

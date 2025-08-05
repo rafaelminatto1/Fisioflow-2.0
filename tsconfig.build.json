@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmit": false,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": [
+    "*.tsx",
+    "*.ts",
+    "components/**/*",
+    "pages/**/*",
+    "contexts/**/*",
+    "hooks/**/*",
+    "services/**/*",
+    "types/**/*",
+    "layouts/**/*",
+    "schemas/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "src/**/*",
+    "mcp-vercel-temp"
+  ]
+}
