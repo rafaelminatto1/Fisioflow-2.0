@@ -55,7 +55,8 @@
       "WebFetch(domain:fisioflow-20-ha6uf08sg-rafael-minattos-projects.vercel.app)",
       "Bash(npx create-vite:*)",
       "WebFetch(domain:fisioflow-20-bslf5xtgd-rafael-minattos-projects.vercel.app)",
-      "Bash(../temp-test-external/node_modules/.bin/vite build --config ../Fisioflow-2.0/vite.config.minimal.ts --root \"../Fisioflow-2.0\" --outDir \"../Fisioflow-2.0/dist-react\")"
+      "Bash(../temp-test-external/node_modules/.bin/vite build --config ../Fisioflow-2.0/vite.config.minimal.ts --root \"../Fisioflow-2.0\" --outDir \"../Fisioflow-2.0/dist-react\")",
+      "WebFetch(domain:fisioflow-20-n2xzi9irx-rafael-minattos-projects.vercel.app)"
     ],
     "deny": []
   }
