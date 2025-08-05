@@ -1,15 +1,10 @@
 import React from 'react';
+import LoginApp from './App-Login';
 
-const AppSimpleTest = () => {
-  console.log('🧪 Simple test App loading...');
+const App = () => {
+  console.log('🚀 FisioFlow: Loading React application...');
   
-  return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>FisioFlow Test App</h1>
-      <p>Esta é uma versão de teste simplificada para verificar se o build está funcionando.</p>
-      <p>Timestamp: {new Date().toISOString()}</p>
-    </div>
-  );
+  return <LoginApp />;
 };
 
-export default AppSimpleTest;
+export default App;
