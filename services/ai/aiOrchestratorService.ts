@@ -56,15 +56,17 @@ class AiOrchestratorService {
   
   constructor() {
     if (API_KEY && API_KEY !== 'dummy-key-for-development') {
-      this.ai = new GoogleGenAI({ apiKey: API_KEY });
+      this.ai = new GoogleGenAI(API_KEY);
     } else {
       // Mock para desenvolvimento sem API key
       this.ai = {
-        models: {
+        getGenerativeModel: () => ({
           generateContent: async () => ({
-            text: 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
+            response: {
+              text: () => 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
+            }
           })
-        }
+        })
       } as any;
     }
   }
@@ -119,13 +121,11 @@ class AiOrchestratorService {
                 return fallbackResponse;
             }
 
-            const result = await this.ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: schedulingPrompt,
-            });
+            const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+            const result = await model.generateContent(schedulingPrompt);
 
             const response: AIResponse = {
-                content: result.text,
+                content: result.response.text(),
                 source: provider,
             };
             this.logQuery(prompt, response);
@@ -179,13 +179,11 @@ class AiOrchestratorService {
             return fallbackResponse;
         }
 
-        const result = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
+        const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const result = await model.generateContent(prompt);
 
         const response: AIResponse = {
-            content: result.text,
+            content: result.response.text(),
             source: provider
         };
         this.logQuery(prompt, response);

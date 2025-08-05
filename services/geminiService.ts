@@ -9,13 +9,15 @@ if (!API_KEY) {
 }
 
 const ai = API_KEY && API_KEY !== 'dummy-key-for-development' 
-  ? new GoogleGenAI({ apiKey: API_KEY })
+  ? new GoogleGenAI(API_KEY)
   : {
-      models: {
+      getGenerativeModel: () => ({
         generateContent: async () => ({
-          text: 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
+          response: {
+            text: () => 'Recurso de IA não disponível no momento. Configure a API key do Gemini.'
+          }
         })
-      }
+      })
     } as any;
 
 const PROMPT_TEMPLATE = `
@@ -107,11 +109,9 @@ export const generateEvaluationReport = async (data: EvaluationFormData): Promis
     }
     
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating evaluation report:", error);
         throw new Error("Falha ao gerar o laudo com a IA. Por favor, tente novamente.");

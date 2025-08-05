@@ -416,4 +416,3 @@ export const initAssetOptimizations = async () => {
 
 // Export singleton instances
 export const imageOptimizer = ImageOptimizer.getInstance();
-export { ResourceCache, FontOptimizer, LazyResourceLoader };
