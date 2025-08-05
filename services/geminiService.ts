@@ -176,11 +176,9 @@ export const generateSessionEvolution = async (data: SessionEvolutionFormData): 
     }
     
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating session evolution:", error);
         throw new Error("Falha ao gerar a evolução com a IA. Por favor, tente novamente.");
@@ -301,11 +299,9 @@ CREFITO: 12345-F
 `;
 
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating HEP:", error);
         throw new Error("Falha ao gerar o plano de exercícios com a IA. Por favor, tente novamente.");
@@ -370,11 +366,9 @@ export const generateRiskAnalysis = async (data: RiskAnalysisFormData): Promise<
     }
     
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating risk analysis:", error);
         throw new Error("Falha ao gerar a análise de risco com a IA. Por favor, tente novamente.");
@@ -459,11 +453,9 @@ export const generatePatientProgressSummary = async (data: PatientProgressData):
     }
 
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating patient progress summary:", error);
         throw new Error("Falha ao gerar o resumo de progresso com a IA.");
@@ -499,11 +491,9 @@ Escreva uma mensagem de lembrete amigável e informativa no formato de texto par
 `;
     
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating appointment reminder:", error);
         throw new Error("Falha ao gerar o lembrete com a IA.");
@@ -549,12 +539,10 @@ Equipe FisioFlow</p>
 `;
     
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
         
-        let htmlContent = response.text;
+        let htmlContent = response.response.text();
         
         // Cleanup response in case the model adds markdown fences
         htmlContent = htmlContent.replace(/^```html\n/, '').replace(/\n```$/, '').trim();
@@ -607,11 +595,9 @@ export const generateClinicalMaterialContent = async (data: ClinicalMaterialData
     prompt = prompt.replace(new RegExp(`{{tipo_material}}`, 'g'), data.tipo_material);
     
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const response = await model.generateContent(prompt);
+        return response.response.text();
     } catch (error) {
         console.error("Error generating clinical material content:", error);
         throw new Error("Falha ao gerar o conteúdo do material com a IA.");

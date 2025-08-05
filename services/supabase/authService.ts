@@ -95,7 +95,19 @@ export class AuthService {
         }
       }
       
-      return { data, error: null, success: true };
+      // Ensure data has the correct structure
+      if (!data?.user) {
+        throw new Error('User creation failed - no user data returned');
+      }
+      
+      return { 
+        data: { 
+          user: data.user, 
+          session: data.session 
+        }, 
+        error: null, 
+        success: true 
+      };
     } catch (error) {
       return { 
         data: null, 

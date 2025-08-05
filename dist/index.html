@@ -103,28 +103,43 @@
       </div>
     </div>
 
+    <!-- Authentication Integration -->
+    <script src="/auth-integration.js"></script>
+    <!-- Router System -->
+    <script src="/router.js"></script>
+    
     <script>
       // Update timestamp
       document.getElementById('timestamp').textContent = new Date().toLocaleString();
       
-      function handleLogin(event) {
-        event.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        console.log('Login attempt:', { email, password });
-        
-        if (email && password) {
-          alert('✅ Login realizado com sucesso!\\n\\nEmail: ' + email + '\\n\\nRedirecionando para o dashboard...');
-          // Aqui seria o redirecionamento para o dashboard
-          // window.location.href = '/dashboard';
-        } else {
-          alert('❌ Por favor, preencha todos os campos.');
-        }
-      }
-      
       console.log('🚀 FisioFlow: Página de login carregada com sucesso!');
       console.log('✅ FisioFlow: Sistema pronto para uso');
+      
+      // Add demo credentials info
+      setTimeout(() => {
+        const demoInfo = document.createElement('div');
+        demoInfo.innerHTML = `
+          <div style="
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            max-width: 300px;
+            z-index: 1000;
+          ">
+            <strong>👤 Credenciais Demo:</strong><br>
+            Admin: admin@fisioflow.com<br>
+            Fisio: fisio@fisioflow.com<br>
+            Paciente: paciente@fisioflow.com<br>
+            <em>Senha: qualquer senha com 6+ caracteres</em>
+          </div>
+        `;
+        document.body.appendChild(demoInfo);
+      }, 2000);
     </script>
   </body>
 </html>

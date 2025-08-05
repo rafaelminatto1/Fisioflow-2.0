@@ -23,7 +23,7 @@ export const login = async (email: string, password: string): Promise<User> => {
       try {
         const { data, error, success } = await SupabaseAuthService.signIn(email, password);
         
-        if (!success || error) {
+        if (!success || error || !data) {
           throw new Error(error?.message || 'Erro de autenticação');
         }
 
@@ -94,7 +94,7 @@ export const register = async (userData: {
         throw new Error(error?.message || 'Erro ao criar conta');
       }
 
-      if (data.user) {
+      if (data?.user) {
         return convertSupabaseUser(data.user);
       } else {
         throw new Error('Usuário não foi criado');

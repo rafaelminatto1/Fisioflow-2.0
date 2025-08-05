@@ -129,6 +129,31 @@ export class CredentialManager {
   public clearSupabaseCredentials(): void {
     delete this.credentials.supabase;
   }
+
+  // Additional methods for MCP client compatibility
+  public async retrieveCredentials(): Promise<VercelCredentials | null> {
+    return this.getVercelCredentials();
+  }
+
+  public async validateToken(token: string): Promise<{ valid: boolean; error?: string }> {
+    // Basic token validation - in a real implementation this would validate against the API
+    if (!token || token.length < 10) {
+      return { valid: false, error: 'Invalid token format' };
+    }
+    return { valid: true };
+  }
+
+  public encryptToken(token: string): string {
+    // In a real implementation, this would properly encrypt the token
+    // For now, just return the token as-is
+    return token;
+  }
+
+  public decryptToken(encryptedToken: string): string {
+    // In a real implementation, this would properly decrypt the token
+    // For now, just return the token as-is
+    return encryptedToken;
+  }
 }
 
 // Singleton instance

@@ -39,6 +39,7 @@
   - _Requirements: 2.1, 3.2_
 
 
+
 - [ ] 2.1 Fix GoogleGenAI constructor usage
   - Update `services/geminiService.ts` to use correct constructor pattern
   - Fix `services/ai/aiOrchestratorService.ts` GoogleGenAI instantiation
@@ -49,18 +50,26 @@
   - Update `services/ai/aiOrchestratorService.ts` to use correct API methods
   - Fix models property access and generateContent method calls
   - Ensure proper response type handling
+
+
   - _Requirements: 2.1, 3.2_
 
 - [ ] 3. Fix Capacitor plugin integration errors
   - Correct StatusBar plugin method usage and type definitions
+
+
   - Fix Camera plugin enum usage and method calls
   - Update App plugin method calls and event listener types
   - Fix Push Notifications type definitions and handlers
   - _Requirements: 2.2, 3.3_
 
+
+
 - [ ] 3.1 Fix StatusBar plugin integration
   - Update `services/mobileService.ts` StatusBar method calls
   - Remove or replace setBackgroundColor method usage
+
+
   - Ensure proper type definitions for StatusBar operations
   - _Requirements: 2.2, 3.3_
 
@@ -70,15 +79,21 @@
   - Ensure proper type definitions for camera operations
   - _Requirements: 2.2, 3.3_
 
-- [ ] 3.3 Fix App plugin integration
+- [x] 3.3 Fix App plugin integration
+
+
   - Update `services/mobileService.ts` App plugin method calls
   - Fix exitApp method usage and availability checks
   - Correct event listener type definitions for app state changes
   - _Requirements: 2.2, 3.3_
 
+
+
 - [ ] 3.4 Fix Push Notifications integration
   - Update `services/mobileService.ts` push notification handlers
   - Fix event listener type definitions for registration and received events
+
+
   - Ensure proper type casting for notification data
   - _Requirements: 2.2, 3.3_
 

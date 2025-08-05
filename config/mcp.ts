@@ -19,6 +19,7 @@ export interface VercelCredentials {
   apiKey: string;
   projectId: string;
   teamId?: string;
+  token?: string; // For backward compatibility
 }
 
 export interface MCPConnectionConfig {
@@ -48,6 +49,38 @@ export const DEFAULT_MCP_CONNECTION_CONFIG: MCPConnectionConfig = {
   retryDelay: 1000,
   maxConcurrentConnections: 5,
 };
+
+// Alias for backward compatibility
+export const MCP_CONNECTION_CONFIG = DEFAULT_MCP_CONNECTION_CONFIG;
+
+// Configuration getter function
+export function getMCPConfig(): MCPConfiguration {
+  // This would typically load from a config file or environment
+  // For now, return a default configuration
+  return {
+    mcpServers: {
+      vercel: {
+        command: 'uvx',
+        args: ['vercel-mcp-server@latest'],
+        env: {
+          VERCEL_TOKEN: '${VERCEL_TOKEN}',
+          VERCEL_PROJECT_ID: '${VERCEL_PROJECT_ID}',
+          VERCEL_TEAM_ID: '${VERCEL_TEAM_ID}',
+          MCP_LOG_LEVEL: 'INFO',
+          FASTMCP_LOG_LEVEL: 'ERROR'
+        },
+        disabled: true,
+        autoApprove: [
+          'get-deployments',
+          'get-deployment-status',
+          'get-project-info',
+          'get-analytics',
+          'get-performance-metrics'
+        ]
+      }
+    }
+  };
+}
 
 // MCP Server types for specific servers
 export interface VercelMCPServerConfig extends MCPServerConfig {

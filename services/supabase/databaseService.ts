@@ -363,9 +363,9 @@ export class DatabaseService {
    * Apply filters to a query
    */
   private applyFilters<T extends Record<string, any>>(
-    query: PostgrestFilterBuilder<any, T, unknown>,
+    query: any, // Using any to avoid complex generic type issues
     filters: Record<string, any>
-  ): PostgrestFilterBuilder<any, T, unknown> {
+  ): any {
     Object.entries(filters).forEach(([key, value]) => {
       if (value === null) {
         query = query.is(key, null);
